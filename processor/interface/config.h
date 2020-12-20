@@ -66,6 +66,7 @@ struct config_t {
         "METFilter_MC",
         "XSWeight",
         "GenLepMatch2l",
+	"bVeto" ,
 	"nLepton" ,
 	"Lepton_pt",
 	"Lepton_eta" ,
