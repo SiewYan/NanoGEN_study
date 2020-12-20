@@ -1,14 +1,11 @@
 # WSignalStudy
 RDataframe signal study
 
-## post-process
+## Processor
 - [ ] ttHMVA maker
-- [ ] ntuplized
+- [ ] skim & slim
+- [ ] added bveto
 
 ## analysis (distribution)
-- [ ] lepton1 pt
-- [ ] lepton2 pt
-- [ ] delta Eta (lep1,lep2)
-- [ ] jet1, jet2
-- [ ] delta Phi MET, jet
-- [ ] mjj
+- [ ] cutflow for preselection
+- [ ] cutflow for categories
