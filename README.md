@@ -6,6 +6,8 @@ RDataframe signal study
 - [x] skim & slim
 - [x] added bveto
 
-## analysis (distribution)
+## analysis
 - [ ] cutflow for preselection
 - [ ] cutflow for categories
+- [ ] distribution profile for GEN-level
+- [ ] distribution profile for RECO-level
