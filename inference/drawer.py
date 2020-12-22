@@ -137,13 +137,21 @@ def plot( sample, n, v, sel, hbins, hmin, hmax, hlog, xlabel, ylabel, dim ):
         #c1.Update()
 
         output+="/"+sample[0]+"/"
+        
+        if n.split('_')[0] == 'an' :
+            output+='analysis/'
+        else:
+            output+='kinematics/'
+
         if not hlog:
             output+="Lin/"
         elif hlog:
             output+="Log/"
-        
+                    
         if not os.path.exists(output):
             os.system('mkdir -p %s' %output)
+
+
 
         #c1.Print( output + n + ".pdf")
         c1.Print( output + n + ".png")

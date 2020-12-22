@@ -4,7 +4,7 @@ from tdrstyle import *
 
 NORM2AU=True
  
-Lhefiles=[ 'ana.root' ]
+Lhefiles=[ 'WHSS.root' ]
 
 # variables
 var =[
@@ -56,6 +56,9 @@ var =[
     ["GenJet2_Eta","genjet.Eta()[1]" , "1==1" , 50 , -5., 5.   , True , "#eta(GenJet2)"       , "A.U." if NORM2AU else "#frac{1}{#sigma} #frac{dN}{d#eta}", 1 ] ,
     ["GenJet2_Phi","genjet.Phi()[1]" , "1==1" , 28 , 0. , 3.15 , True , "#phi(GenJet2)"       , "A.U." if NORM2AU else "#frac{1}{#sigma} #frac{dN}{d#Phi}", 1 ] ,
 
+    #analysis
+    #Associated W system DeltaPhi(W,lepton) 
+    ["an_W1_Lep1_dPhi","deltaPhi(Wboson.Phi()[0],lepton1.Phi()[0])" ,"1==1" , 28 , 0. , 3.15 , True, "DeltaPhi(W1,Lepton1)", "A.U." , 1 ],
 ]
 
 for lhe in Lhefiles:

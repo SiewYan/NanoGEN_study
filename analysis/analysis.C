@@ -19,7 +19,6 @@ TH1D* Gen_met_phi;
 TH1D* GenMETpt;
 TH1D* GenMETphi;
 
-
 std::vector<TLorentzVector> Wboson;
 std::vector<TLorentzVector> WHboson;
 std::vector<TLorentzVector> Hboson;
@@ -28,11 +27,12 @@ std::vector<TLorentzVector> lepton2;
 std::vector<TLorentzVector> Wquark;
 std::vector<TLorentzVector> genjet;
 std::vector<TLorentzVector> Neutrino;
+std::vector<TLorentzVector> MET;
 
 std::vector<Float_t> genjet_matchdR;
 std::vector<Int_t> genjet_pdgId;
 
-TFile* out = new TFile( "ana.root" , "recreate" );
+TFile* out = new TFile( "WHSS.root" , "recreate" );
 TTree* gen_tree = new TTree( "gen" , "gen" );
 
 TDirectory* genlevel =  out->mkdir("nGen_object");
@@ -62,6 +62,7 @@ void analysis_Begin(TTree*) {
   gen_tree->Branch( "Wquark"  , &Wquark );
   gen_tree->Branch( "genjet"  , &genjet );
   gen_tree->Branch( "Neutrino"  , &Neutrino );
+  gen_tree->Branch( "MET"       , &MET );
 
   gen_tree->Branch( "genjet_matchdR" , &genjet_matchdR );
   gen_tree->Branch( "genjet_pdgId" , &genjet_pdgId );
@@ -80,6 +81,7 @@ void analysis() {
   Wquark.clear();
   genjet.clear();
   Neutrino.clear();
+  MET.clear();
 
   genjet_matchdR.clear();
   genjet_pdgId.clear();
@@ -164,6 +166,7 @@ void analysis() {
     Neutrino.push_back(VX);
     VXX+=VX;
   }
+  MET.push_back(VXX);
   
   // GenPart (QUARK)
   std::vector<TLorentzVector> GenQuark;
