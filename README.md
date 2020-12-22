@@ -9,5 +9,5 @@ RDataframe signal study
 ## analysis
 - [ ] cutflow for preselection
 - [ ] cutflow for categories
-- [ ] distribution profile for GEN-level
+- [x] distribution profile for GEN-level
 - [ ] distribution profile for RECO-level
