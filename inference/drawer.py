@@ -86,14 +86,15 @@ def plot( sample, n, v, sel, hbins, hmin, hmax, hlog, xlabel, ylabel, dim ):
             hist[s].SetLineWidth(2)#3
             hist[s].SetFillColorAlpha(colour[i],0.35)
             hist[s].SetFillStyle(3005)
-
-            if hist[s].GetMaximum() > max: max = hist[s].GetMaximum()*6
-	    if hist[s].GetMinimum() < min: min = hist[s].GetMinimum()
-
-            #leg = TLegend(0.4, 0.9-0.035*len(sample), 0.68, 0.89)
             
-            hist[sample[0]].SetMaximum(max*1.2)
-            hist[sample[0]].SetMinimum(min+1.e6)
+            if hlog:
+                if hist[s].GetMaximum() > max: max = hist[s].GetMaximum()*6
+                if hist[s].GetMinimum() < min: min = hist[s].GetMinimum()
+                hist[sample[0]].SetMaximum(max*1.2)
+                hist[sample[0]].SetMinimum(min+1.e6)
+            else:
+                hist[sample[0]].SetMaximum( hist[s].GetMaximum()*1.2 )
+                hist[sample[0]].SetMinimum( hist[s].GetMinimum() )
 
             hist[sample[0]].GetXaxis().SetTitle("%s" %xlabel)
             hist[sample[0]].GetYaxis().SetTitle("%s" %ylabel)
@@ -114,11 +115,16 @@ def plot( sample, n, v, sel, hbins, hmin, hmax, hlog, xlabel, ylabel, dim ):
                 2 dimensional histogram parameters."; exit;
             else:
                 #X axis parameters follow by Y axis parameters
-                hist[s] = TH2F( s, ";"+v, hbins[0], hmin[0] , hmax[0], hbins[1], hmin[1] , hmax[1] )
-                # v in the form of x:y
+                hist[s] = TH2F( s, n+";"+v, hbins[1], hmin[1] , hmax[1], hbins[0], hmin[0] , hmax[0] )
+                # v in the form of y:x
                 tree[s].Project(s, v, "%s"%sel,"colz")
 
                 hist[s].Draw("COLZ")
+                xlabel_ = xlabel.split(':')[-1]
+                ylabel_ = xlabel.split(':')[0]
+                hist[s].GetXaxis().SetTitle("%s" %xlabel_)
+                hist[s].GetYaxis().SetTitle("%s" %ylabel_)
+            
                 #if hlog:
                 #    c1.GetPad(0).SetLogy()
                 #    c1.GetPad(0).SetLogx()

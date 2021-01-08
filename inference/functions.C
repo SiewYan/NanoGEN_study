@@ -15,13 +15,9 @@ float deltaR(float phi1, float eta1, float phi2, float eta2) {
   return sqrt((eta2-eta1)*2+deltaPhi(phi1,phi2)*2);
 }
 
-//float DeltaR(TLorentzVector *tlv1, TLorentzVector *tlv2) {
-//  float phi1 = tlv1->Phi();
-//  float phi2 = tlv2->Phi();
-//  float eta1 = tlv1->Eta();
-//  float eta2 = tlv2->Eta();
-//  return deltaR(eta1, phi1, eta2, phi2);
-//}
+float deltaEta(float eta1 , float eta2){
+  return abs(eta1-eta2);
+}
 
 float vectorSumPhi(float px1, float py1, float px2, float py2){
   float phi = atan((py1+py2)/(px1+px2));
