@@ -3,7 +3,7 @@ from collections import OrderedDict
 
 ROOT.gStyle.SetPaintTextFormat("4.2f")
 
-year="2018"
+year="2016"
 
 process={
     'top'        : [ "histo_top" ],
@@ -46,7 +46,8 @@ filter_label={
     'cut1_mll12' : 'mll > 12', 
     'cut2_lepPt'  : 'Lepton cuts', 
     'cut3_bVeto'  : 'b-tag Veto', 
-    'cut4_metcut' : 'E_{T}^{miss} > 30 GeV',
+    #'cut4_metcut' : 'E_{T}^{miss} > 30 GeV',
+    'cut4_metcut' : 'Pre-selection',
     'cut5_SS_inclusive' : 'Same sign',
     'cut6_SS_inclusive_1j' : 'njet >= 1',
     'cut7_SS_inclusive_1j_deta2' : '#Delta#eta(l_{1},l_{2}) < 2.0',
@@ -86,12 +87,21 @@ var="events"
 #var="mlljj20_whss_bin3"
 
 #template_yield =OrderedDict({'nS' : 0. , 'nB' : 0. , 'bkgs' : {} , 'data' : 0. , 'sig' : 0. })
-cutflow_incl_1j = [ 'cut0_all' , 'cut1_mll12', 'cut2_lepPt', 'cut3_bVeto', 'cut4_metcut', 'cut5_SS_inclusive', 'cut6_SS_inclusive_1j', 'cut7_SS_inclusive_1j_deta2', 'cut8_SS_inclusive_1j_mlljj50' ]
-cutflow_incl_2j = [ 'cut0_all' , 'cut1_mll12', 'cut2_lepPt', 'cut3_bVeto', 'cut4_metcut', 'cut5_SS_inclusive', 'cut6_SS_inclusive_2j', 'cut7_SS_inclusive_2j_mjj100' , 'cut8_SS_inclusive_2j_deta2', 'cut9_SS_inclusive_2j_mlljj50' ]
-cutflow_uu_1j = [ 'cut0_all' , 'cut1_mll12', 'cut2_lepPt', 'cut3_bVeto', 'cut4_metcut', 'cut5_SFuu', 'cut6_SFuu_nLep2', 'cut7_SFuu_1j', 'cut8_SFuu_1j_deta2', 'cut9_SFuu_1j_Zveto', 'cut10_SFuu_1j_mlljj50' ]
-cutflow_uu_2j = [ 'cut0_all' , 'cut1_mll12', 'cut2_lepPt', 'cut3_bVeto', 'cut4_metcut', 'cut5_SFuu', 'cut6_SFuu_nLep2', 'cut7_SFuu_2j', 'cut8_SFuu_2j_mjj100', 'cut9_SFuu_2j_deta2', 'cut10_SFuu_2j_Zveto', 'cut11_SFuu_2j_mlljj50' ] 
-cutflow_eu_1j = [ 'cut0_all' , 'cut1_mll12', 'cut2_lepPt', 'cut3_bVeto', 'cut4_metcut', 'cut5_OFeu', 'cut6_OFeu_nLep2', 'cut7_OFeu_1j', 'cut8_OFeu_1j_deta2', 'cut9_OFeu_1j_mlljj50' ]
-cutflow_eu_2j = [ 'cut0_all' , 'cut1_mll12', 'cut2_lepPt', 'cut3_bVeto', 'cut4_metcut', 'cut5_OFeu', 'cut6_OFeu_nLep2', 'cut7_OFeu_2j', 'cut8_OFeu_2j_mjj100', 'cut9_OFeu_2j_deta2', 'cut10_OFeu_2j_mlljj50' ]
+#cutflow_incl_1j = [ 'cut0_all' , 'cut1_mll12', 'cut2_lepPt', 'cut3_bVeto', 'cut4_metcut', 'cut5_SS_inclusive', 'cut6_SS_inclusive_1j', 'cut7_SS_inclusive_1j_deta2', 'cut8_SS_inclusive_1j_mlljj50' ]
+#cutflow_incl_2j = [ 'cut0_all' , 'cut1_mll12', 'cut2_lepPt', 'cut3_bVeto', 'cut4_metcut', 'cut5_SS_inclusive', 'cut6_SS_inclusive_2j', 'cut7_SS_inclusive_2j_mjj100' , 'cut8_SS_inclusive_2j_deta2', 'cut9_SS_inclusive_2j_mlljj50' ]
+#cutflow_uu_1j = [ 'cut0_all' , 'cut1_mll12', 'cut2_lepPt', 'cut3_bVeto', 'cut4_metcut', 'cut5_SFuu', 'cut6_SFuu_nLep2', 'cut7_SFuu_1j', 'cut8_SFuu_1j_deta2', 'cut9_SFuu_1j_Zveto', 'cut10_SFuu_1j_mlljj50' ]
+#cutflow_uu_2j = [ 'cut0_all' , 'cut1_mll12', 'cut2_lepPt', 'cut3_bVeto', 'cut4_metcut', 'cut5_SFuu', 'cut6_SFuu_nLep2', 'cut7_SFuu_2j', 'cut8_SFuu_2j_mjj100', 'cut9_SFuu_2j_deta2', 'cut10_SFuu_2j_Zveto', 'cut11_SFuu_2j_mlljj50' ] 
+#cutflow_eu_1j = [ 'cut0_all' , 'cut1_mll12', 'cut2_lepPt', 'cut3_bVeto', 'cut4_metcut', 'cut5_OFeu', 'cut6_OFeu_nLep2', 'cut7_OFeu_1j', 'cut8_OFeu_1j_deta2', 'cut9_OFeu_1j_mlljj50' ]
+#cutflow_eu_2j = [ 'cut0_all' , 'cut1_mll12', 'cut2_lepPt', 'cut3_bVeto', 'cut4_metcut', 'cut5_OFeu', 'cut6_OFeu_nLep2', 'cut7_OFeu_2j', 'cut8_OFeu_2j_mjj100', 'cut9_OFeu_2j_deta2', 'cut10_OFeu_2j_mlljj50' ]
+
+## preselection - cuts 
+cutflow_incl_1j = [ 'cut4_metcut', 'cut5_SS_inclusive', 'cut6_SS_inclusive_1j', 'cut7_SS_inclusive_1j_deta2', 'cut8_SS_inclusive_1j_mlljj50' ]
+cutflow_incl_2j = [ 'cut4_metcut', 'cut5_SS_inclusive', 'cut6_SS_inclusive_2j', 'cut7_SS_inclusive_2j_mjj100' , 'cut8_SS_inclusive_2j_deta2', 'cut9_SS_inclusive_2j_mlljj50' ]
+cutflow_uu_1j = [ 'cut4_metcut', 'cut5_SFuu', 'cut6_SFuu_nLep2', 'cut7_SFuu_1j', 'cut8_SFuu_1j_deta2', 'cut9_SFuu_1j_Zveto', 'cut10_SFuu_1j_mlljj50' ]
+cutflow_uu_2j = [ 'cut4_metcut', 'cut5_SFuu', 'cut6_SFuu_nLep2', 'cut7_SFuu_2j', 'cut8_SFuu_2j_mjj100', 'cut9_SFuu_2j_deta2', 'cut10_SFuu_2j_Zveto', 'cut11_SFuu_2j_mlljj50' ]
+cutflow_eu_1j = [ 'cut4_metcut', 'cut5_OFeu', 'cut6_OFeu_nLep2', 'cut7_OFeu_1j', 'cut8_OFeu_1j_deta2', 'cut9_OFeu_1j_mlljj50' ]
+cutflow_eu_2j = [ 'cut4_metcut', 'cut5_OFeu', 'cut6_OFeu_nLep2', 'cut7_OFeu_2j', 'cut8_OFeu_2j_mjj100', 'cut9_OFeu_2j_deta2', 'cut10_OFeu_2j_mlljj50' ]
+
 
 workflow=OrderedDict()
 #prepare structure
@@ -120,17 +130,30 @@ for icutflow in workflow:
                 'nB' : nB , 
                 'bkgs' : process_ , 
                 'data' : f.Get( '%s/%s/histo_DATA'%( icut , var ) ).Integral() , 
-                'sig' : (nS)/ROOT.TMath.Sqrt(nB+nS)
+                # http://tid.uio.no/epf/seminar/slides/simpleopt.pdf
+                'sig' : (nS)/ROOT.TMath.Sqrt(nB+nS) # optimize power (sensitivity) of analysis
+                #'sig' : (nS)/ROOT.TMath.Sqrt(nB)   # optimize significance of signal
             }
         )
         workflow[icutflow][icut] = template_yield
 ###############################################################################################
 canvas={}
 useDATA=False
+#exclusive=False
+#gap=0
+#if exclusive:
+#    gap=3
 
 # each cutflow one histogram
 for icutflow in workflow:
     xlabels = list(workflow[icutflow].keys())
+    #xlabels_ = []
+    #if exclusive:
+    #    for icut in xlabels:
+    #        if int(icut.split('_')[0].split('cut')[-1]) <3 : continue
+    #        print(icut)
+    #        xlabels_.append(icut)
+    #xlabels = xlabels_
     nbins = len(xlabels)
     hist=OrderedDict()
     
@@ -150,6 +173,8 @@ for icutflow in workflow:
     
     # iterate cut and fill histogram of background composition
     for icut, ibin in zip( workflow[icutflow] , range(0,nbins) ):
+        #if exclusive:
+        #    if int(icut.split('_')[0].split('cut')[-1]) <gap : continue 
         for ihist in hist: hist[ihist].Fill( ibin , workflow[icutflow][icut]['bkgs'][ihist] )
         hist_signal.Fill( ibin , workflow[icutflow][icut]['nS'] )
         if useDATA: hist_data.Fill( ibin , workflow[icutflow][icut]['data'] )
@@ -207,7 +232,7 @@ for icutflow in workflow:
     bkg.Draw("HIST") # stack
     hist_signal.Scale(1) # scale signal
     
-    for icut, ibin in zip( workflow[icutflow] , range(0,nbins)): latex.DrawLatex( ibin , hist_signal.GetBinContent(ibin+1)*1.6 , '%.2f' %workflow[icutflow][icut]['sig'] ) # S/#sqrt{B}=%.2f
+    for icut, ibin in zip( workflow[icutflow] , range(0,nbins)): latex.DrawLatex( ibin , hist_signal.GetBinContent(ibin+1)*1.6 , 'S/#sqrt{B+S} = %.2f' %workflow[icutflow][icut]['sig'] ) # S/#sqrt{B}=%.2f
     
     hist_signal.Draw("SAME, HIST") # sum of bkg
     if useDATA: hist_data.Draw("SAME, PE")
