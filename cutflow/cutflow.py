@@ -4,7 +4,7 @@ from drawUtil import *
 
 ROOT.gStyle.SetPaintTextFormat("4.2f")
 
-year="2016"
+year="2018"
 
 process={
     'top'        : [ "histo_top" ],
@@ -225,15 +225,15 @@ for icutflow in workflow:
 
     latex = ROOT.TLatex()
     #latex.SetNDC()
-    latex.SetTextAlign(12)
+    latex.SetTextAlign(12) #12
     latex.SetTextColor(1)
     latex.SetTextFont(72)
-    latex.SetTextSize(0.02)
+    latex.SetTextSize(0.025)
 
     bkg.Draw("HIST") # stack
     hist_signal.Scale(1) # scale signal
     
-    for icut, ibin in zip( workflow[icutflow] , range(0,nbins)): latex.DrawLatex( ibin , hist_signal.GetBinContent(ibin+1)*1.6 , 'S/#sqrt{B+S} = %.2f' %workflow[icutflow][icut]['sig'] ) # S/#sqrt{B}=%.2f
+    for icut, ibin in zip( workflow[icutflow] , range(0,nbins)): latex.DrawLatex( ibin+0.4 , hist_signal.GetBinContent(ibin+1)*1.6 , '%.2f' %workflow[icutflow][icut]['sig'] ) # S/#sqrt{B}=%.2f
     
     hist_signal.Draw("SAME, HIST") # sum of bkg
     if useDATA: hist_data.Draw("SAME, PE")
