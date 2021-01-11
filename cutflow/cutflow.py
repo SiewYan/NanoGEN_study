@@ -1,5 +1,6 @@
 import ROOT, sys
 from collections import OrderedDict
+from drawUtil import *
 
 ROOT.gStyle.SetPaintTextFormat("4.2f")
 
@@ -180,7 +181,7 @@ for icutflow in workflow:
         if useDATA: hist_data.Fill( ibin , workflow[icutflow][icut]['data'] )
         
     # create stack histogram
-    bkg = ROOT.THStack( "bkg", "%s %s; ; Events" %( fin.split('_')[2] , icutflow ) )
+    bkg = ROOT.THStack( "bkg", "; ; Events" ) #%( fin.split('_')[2] , icutflow ) )
     for ihist in hist: 
         hist[ihist].SetFillColor(groupList[ihist]['fillcolor'])
         hist[ihist].SetFillStyle(groupList[ihist]['fillstyle'])
@@ -237,6 +238,9 @@ for icutflow in workflow:
     hist_signal.Draw("SAME, HIST") # sum of bkg
     if useDATA: hist_data.Draw("SAME, PE")
     leg.Draw()
+
+    drawCMS(year,"Significance study",True)
+    drawRegion(icutflow)
 
     canvas[icutflow].Update()
 
