@@ -98,7 +98,8 @@ def plot( sample, n, v, sel, hbins, hmin, hmax, hlog, xlabel, ylabel, dim ):
 
             hist[sample[0]].GetXaxis().SetTitle("%s" %xlabel)
             hist[sample[0]].GetYaxis().SetTitle("%s" %ylabel)
-            hist[sample[0]].SetTitle("%s" %n)
+            #hist[sample[0]].SetTitle("%s" %n)
+            hist[sample[0]].SetTitle("")
 
             if len(sample)>1:
                 for i, s in enumerate(sample):
@@ -116,6 +117,7 @@ def plot( sample, n, v, sel, hbins, hmin, hmax, hlog, xlabel, ylabel, dim ):
             else:
                 #X axis parameters follow by Y axis parameters
                 hist[s] = TH2F( s, n+";"+v, hbins[1], hmin[1] , hmax[1], hbins[0], hmin[0] , hmax[0] )
+                #hist[s] = TH2F( s, n+";", hbins[1], hmin[1] , hmax[1], hbins[0], hmin[0] , hmax[0] )
                 # v in the form of y:x
                 tree[s].Project(s, v, "%s"%sel,"colz")
 
@@ -124,6 +126,7 @@ def plot( sample, n, v, sel, hbins, hmin, hmax, hlog, xlabel, ylabel, dim ):
                 ylabel_ = xlabel.split(':')[0]
                 hist[s].GetXaxis().SetTitle("%s" %xlabel_)
                 hist[s].GetYaxis().SetTitle("%s" %ylabel_)
+                hist[s].SetTitle("")
             
                 #if hlog:
                 #    c1.GetPad(0).SetLogy()

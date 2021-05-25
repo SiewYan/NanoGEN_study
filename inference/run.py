@@ -84,6 +84,8 @@ var =[
     #W2W3 system
     ["an_W2_W3_dPhi","deltaPhi(WHboson.Phi()[0],WHboson.Phi()[1])" ,"1==1" , 28 , 0. , 3.15 , True, "#Delta#phi(W2,W3)", "A.U." , 1 ],
     ["an_W2_W3_dR"  ,"deltaR(WHboson.Phi()[0],WHboson.Eta()[0],WHboson.Phi()[1],WHboson.Eta()[1])" ,"1==1",60 , 0. , 5 , True, "#DeltaR(W2,W3)", "A.U." ,1],
+    ["an_H_W2W3_dR_2D","deltaR(WHboson.Phi()[0],WHboson.Eta()[0],WHboson.Phi()[1],WHboson.Eta()[1]):Hboson.Pt()[0]" ,"",[28,50] , [0.,0.] , [3.,800.] , True, "#Delta R(W2,W3) : H Pt [GeV]", "A.U." , 2],
+    ["an_H_l2v2j1j2_dR_2D","deltaR(l2v2.Phi()[0],l2v2.Eta()[0],dijets.Phi()[1],dijets.Eta()[1]):Hboson.Pt()[0]" ,"",[28,50] , [0.,0.] , [3.,800.] , True, "#Delta R(l2v2,jij2) : H Pt [GeV]", "A.U." , 2],
 
     # lepton1 and lepton2 system
     ["an_Lep1_Lep2_dPhi","deltaPhi(lepton1.Phi()[0],lepton2.Phi()[0])" ,"1==1" , 28 , 0. , 3.15 , True, "#Delta#phi(Lepton1,Lepton2)", "A.U." , 1 ],
@@ -125,10 +127,14 @@ var =[
     # l2v2 -- dijet system
     ["an_l2v2_jj_dPhi","deltaPhi(l2v2.Phi()[0],dijets.Phi()[0])" ,"Length$(genjet)>=2" , 31 , 0. , 3.15 , False, "#Delta#phi(l2v2,jj)", "A.U." , 1 ],
     ["an_l2v2_jj_dR"  ,"deltaR(l2v2.Phi()[0],l2v2.Eta()[0],dijets.Phi()[0],dijets.Eta()[0])" ,"Length$(genjet)>=2",60 , 0. , 5 , True, "#DeltaR(l2v2,jj)", "A.U." ,1],
+
+    # l2 -- dijet system
+    ["an_l2_jj_dPhi","deltaPhi(lepton2.Phi()[0],dijets.Phi()[0])" ,"Length$(genjet)>=2" , 31 , 0. , 3.15 , False, "#Delta#phi(l_{2},jj)", "A.U." , 1 ],
     
     #showing off-shell effect
     ["an_l2v2_mass"  ,"l2v2.M()[0]" ,"1==1", 100 , 0. , 110 , False, "M( l_{2} , #nu_{2} ) [GeV/c^{2}]", "A.U." ,1],
     ["an_l1v1_mass"  ,"l1v1.M()[0]" ,"1==1", 100 , 0. , 110 , False, "M( l_{1} , #nu_{1} ) [GeV/c^{2}]", "A.U." ,1],
+    #["an_l2v2jj_mass"  ,"(l2v2+dijets)[0].M()" ,"1==1", 100 , 0. , 150 , False, "M( l_{2}#nu_{2}jj ) [GeV/c^{2}]", "A.U." ,1],
     ["an_l2v2_offshell_dPhi"  ,"deltaPhi(lepton2.Phi()[0],neutrino2.Phi()[0])" ,"l2v2.M()[0]<50", 31 , 0. , 3.15 , False, "#Delta#phi( l_{2} , #nu_{2} )", "A.U." ,1],
     ["an_j1j2_offshell_dPhi"  ,"deltaPhi(genjet.Phi()[0],genjet.Phi()[1])" ,"l2v2.M()[0]>50", 31 , 0. , 3.15 , False, "#Delta#phi( Genjet_{1} , Genjet_{2} )", "A.U." ,1],
     #system l1v1 + lv2jet
@@ -138,17 +144,17 @@ var =[
     # between W1 and H
     ["an_W1_H_pt_2D","Wboson.Pt()[0]:Hboson.Pt()[0]" ,"",[50,50] , [0.,0.] , [400,400] , True, "W1 Pt [GeV] : H Pt [GeV]", "A.U." , 2],
     # between W1 and deltaPhi(H,W)
-    ["an_W1_pt_HW1_dPhi_2D","Wboson.Pt()[0]:deltaPhi(Hboson.Phi()[0],Wboson.Phi()[0])" ,"",[50,28] , [0.,0.] , [400,3.15] , True, "W1 Pt [GeV] : #Delta#phi(W1,H)", "A.U." , 2],
+    ["an_W1_pt_HW1_dPhi_2D","deltaPhi(Hboson.Phi()[0],Wboson.Phi()[0]):Wboson.Pt()[0]" ,"",[28,50] , [0.,0.] , [3.15,400] , True, "#Delta#phi(W1,H) : W1 Pt [GeV]", "A.U." , 2],
     # between W1 and lv1 decay product
-    ["an_W1_pt_lv1_dPhi_2D","Wboson.Pt()[0]:deltaPhi(neutrino1.Phi()[0],lepton1.Phi()[0])" ,"",[50,28] , [0.,0.] , [400,3.15] , True, "W1 Pt [GeV] : #Delta#phi(l1,v1)", "A.U." , 2],
+    ["an_W1_pt_lv1_dPhi_2D","deltaPhi(neutrino1.Phi()[0],lepton1.Phi()[0]):Wboson.Pt()[0]" ,"",[28,50] , [0.,0.] , [3.15,400] , True, "#Delta#phi(l1,v1) : W1 Pt [GeV]", "A.U." , 2],
     # between l2v2 and jj decay product
     ["an_l2v2_mjj_pt_2D","l2v2.Pt()[0]:dijets.Pt()[0]" ,"", [30,30] , [0.,0.] , [200,200] , True, "l2v2 Pt [GeV] : jj Pt [GeV]", "A.U." , 2],
     # between l1v1 and l2v2 deltaphi
     ["an_l1v1_pt_l2v2_dPhi_2D","l1v1.Pt()[0]:deltaPhi(lepton2.Phi()[0],neutrino2.Phi()[0])" ,"", [50,28] , [0.,0.] , [300,3.15] , True, "l1v1 Pt [GeV] : #Delta#phi(l2,v2)","A.U.", 2],
-    ["an_H_pt_l2v2_dPhi_2D","Hboson.Pt()[0]:deltaPhi(lepton2.Phi()[0],neutrino2.Phi()[0])" ,"l2v2.M()[0]<50", [50,28] , [0.,0.] , [300,3.15] , True, "H Pt [GeV] : #Delta#phi(l2,v2)","A.U.", 2],
+    ["an_H_pt_l2v2_dPhi_2D","deltaPhi(lepton2.Phi()[0],neutrino2.Phi()[0]):Hboson.Pt()[0]" ,"l2v2.M()[0]<50", [28,50] , [0.,0.] , [3.15,300] , True, "#Delta#phi(l2,v2) : H Pt [GeV]","A.U.", 2],
     # between l1v1 and jj deltaphi
     ["an_l1v1_pt_jj_dPhi_2D","l1v1.Pt()[0]:deltaPhi(genjet.Phi()[0],genjet.Phi()[1])" ,"", [50,28] , [0.,0.] , [300,3.15] , True, "l1v1 Pt [GeV] : #Delta#phi(j1,j2)","A.U.", 2],
-    ["an_H_pt_jj_dPhi_2D","Hboson.Pt()[0]:deltaPhi(genjet.Phi()[0],genjet.Phi()[1])" ,"", [50,28] , [0.,0.] , [300,3.15] , True, "H Pt [GeV] : #Delta#phi(j1,j2)","A.U.", 2],
+    ["an_H_pt_jj_dPhi_2D","deltaPhi(genjet.Phi()[0],genjet.Phi()[1]):Hboson.Pt()[0]" ,"", [28,50] , [0.,0.] , [3.15,300] , True, "#Delta#phi(j1,j2) : H Pt [GeV]","A.U.", 2],
 
 ]
 
