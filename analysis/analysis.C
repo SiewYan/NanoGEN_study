@@ -9,6 +9,7 @@
 TH1D* Gen_nlepton1;
 TH1D* Gen_nlepton2;
 TH1D* Gen_nWquark;
+TH1D* Gen_nWQuark;
 TH1D* Gen_njet;
 TH1D* Gen_nWboson;
 TH1D* Gen_nWHboson;
@@ -63,7 +64,8 @@ void analysis_Begin(TTree*) {
   // generated object number
   Gen_nlepton1    = new TH1D ( "Gen_nlepton1"  , "Gen_nlepton1"   , 10 , 0  , 10     );
   Gen_nlepton2    = new TH1D ( "Gen_nlepton2"  , "Gen_nlepton2"   , 10 , 0  , 10     );
-  Gen_nWquark     = new TH1D ( "Gen_nWquark"   , "Gen_nWquark"    , 10 , 0  , 10     );  
+  Gen_nWquark     = new TH1D ( "Gen_nWquark"   , "Gen_nWquark"    , 10 , 0  , 10     );
+  Gen_nWQuark     = new TH1D ( "Gen_nWQuark"   , "Gen_nWQuark"    , 10 , 0  , 10     );
   Gen_njet        = new TH1D ( "Gen_njet"      , "Gen_njet"       , 10 , 0  , 10     );
   Gen_nWboson     = new TH1D ( "Gen_nWboson"   , "Gen_nWboson"    , 10 , 0  , 10     );
   Gen_nWHboson    = new TH1D ( "Gen_nWHboson"  , "Gen_nWHboson"    , 10 , 0  , 10     );
@@ -142,7 +144,7 @@ void analysis() {
 
   Int_t bosons[3]   = { 24 , -24 , 25 };
   //Int_t partons[8] = { 1, -1, 2, -2, 3, -3, 4, -4 };
-  Int_t partons[11] = { 1, -1, 2, -2, 3, -3, 4, -4 , 5 , -5 , 21 };
+  Int_t partons[11] = { 1, -1, 2, -2, 3, -3, 4, -4 , 5 , -5 }; //21
   Int_t leptons[4]  = { 11, -11, 13, -13 };
   Int_t neutrinos[6] = { 12 , -12 , 14 , -14 , 16 , -16 };
 
@@ -268,11 +270,11 @@ void analysis() {
     if ( !( std::find(std::begin(partons), std::end(partons), GenPart_pdgId[i]) != std::end(partons) ) ) continue;
     
     // fromHardProcess
-    //if ( !(GenPart_statusFlags[i] >> 8 & 1) ) continue;
+    if ( !(GenPart_statusFlags[i] >> 8 & 1) ) continue;
     // isPrompt
-    //if ( !(GenPart_statusFlags[i] & 1) ) continue;
+    if ( !(GenPart_statusFlags[i] & 1) ) continue;
     // LastCopy
-    //if ( !(GenPart_statusFlags[i] >> 13 & 1) ) continue;
+    if ( !(GenPart_statusFlags[i] >> 13 & 1) ) continue;
     // motherIndx is valid
     if ( GenPart_genPartIdxMother[i] == -1 ) continue;
     
@@ -295,42 +297,59 @@ void analysis() {
   }
   
   std::vector<std::pair<std::pair<TLorentzVector,TLorentzVector>, std::pair<Float_t,Int_t> >> pair_dR;
-  // only one matches
-  for ( UInt_t i=0 ; i < nGenJet ; i++ ){
+  // quark match genjet
+  // size of GenQuark is always 2
+  //GenQuark = IndexByPt( GenQuark );
+  for ( std::vector<TLorentzVector>::iterator it = GenQuark.begin() ; it != GenQuark.end(); ++it ){
+    TLorentzVector Q = *it;
     pair_dR.clear();
-    VX.SetPtEtaPhiM( GenJet_pt[i] , GenJet_eta[i] , GenJet_phi[i] , GenJet_mass[i] );
-    Int_t counter=0;
-    for ( std::vector<TLorentzVector>::iterator it = GenQuark.begin() ; it != GenQuark.end(); ++it ){
-      //if ( GenJet_partonFlavour[i] != GenQuark_pdgId[counter] ) continue;
-      Float_t dR = deltaR( VX.Phi() , VX.Eta() , it->Phi() , it->Eta() );
+    for ( UInt_t i=0 ; i < nGenJet ; i++ ){
+      VX.SetPtEtaPhiM( GenJet_pt[i] , GenJet_eta[i] , GenJet_phi[i] , GenJet_mass[i] );
+      Float_t dR = deltaR( Q.Phi() , Q.Eta() , VX.Phi() , VX.Eta() );
       if (dR > 0.4) continue;
-      pair_dR.push_back(std::make_pair(std::make_pair(VX,*it),std::make_pair(dR,GenJet_partonFlavour[i]))); 
-      counter++;
-    } // end of Wquark loop
-    if (pair_dR.size()>=1){
-      pair_dR = IndexBydR( pair_dR );
-      genjet.push_back(pair_dR[0].first.first);
-      Wquark.push_back(pair_dR[0].first.second);
-      genjet_matchdR.push_back(pair_dR[0].second.first);
-      genjet_pdgId.push_back(pair_dR[0].second.second);
+      pair_dR.push_back(std::make_pair(std::make_pair(VX,Q),std::make_pair(dR,GenJet_partonFlavour[i])));
+    } // end of genjet
+    if (pair_dR.size() == 0 ) continue;
+    // for multiple copy of matched genjet, take only the minimum dR's
+    pair_dR = IndexBydR( pair_dR );
+    
+    TLorentzVector genjet_ = pair_dR[0].first.first;
+    TLorentzVector Wquark_ = pair_dR[0].first.second;
+    Float_t matchDr = pair_dR[0].second.first;
+    Int_t genjet_pdgid = pair_dR[0].second.second;
+    
+    genjet.push_back(genjet_);
+    Wquark.push_back(Wquark_);
+    genjet_matchdR.push_back(matchDr);
+    genjet_pdgId.push_back(genjet_pdgid);
+    
+  } // end of genquark
 
-      genjet = IndexByPt( genjet );
-      Wquark  = IndexByPt( Wquark );
-      TLorentzVector dijet = ( genjet.size()>=2 ) ? genjet[0] + genjet[1] : genjet[0]; // jet system taken inclusively up to 2 jets
-      TLorentzVector diquark = ( Wquark.size()>=2 ) ? Wquark[0] + Wquark[1] : Wquark[0]; // quark system taken inclusively up to 2 quarks
-      dijets.push_back(dijet);
-      diquarks.push_back(diquark);
-      // lepton2 + genjet
-      lep2jets.push_back(lepton2[0] + dijets[0]);
-      dilep2jets.push_back(lepton2[0] + lepton2[0] + dijets[0]);
-      lv2jets.push_back( l2v2[0] + dijets[0]);
-      // lepton2 + quark
-      lep2quarks.push_back(lepton2[0] + diquarks[0]);
-      dilep2quarks.push_back(lepton2[0] + lepton2[0] + diquarks[0]);
-      lv2quarks.push_back( l2v2[0] + diquarks[0]);
+  if ( genjet.size() > 0 && Wquark.size() > 0 ){
+
+    // remove duplicate genjet
+    if ( genjet.size() == 2 ){
+      if (genjet[0].Pt() == genjet[1].Pt())
+	genjet.pop_back();
     }
-  } // end of GenJet loop
-  
+
+    // sort in pt 
+    //genjet = IndexByPt( genjet );
+    //Wquark = IndexByPt( Wquark );
+    
+    TLorentzVector dijet = ( genjet.size()>=2 ) ? genjet[0] + genjet[1] : genjet[0]; // jet system taken inclusively up to 2 jets
+    TLorentzVector diquark = ( Wquark.size()>=2 ) ? Wquark[0] + Wquark[1] : Wquark[0]; // quark system taken inclusively up to 2 quarks
+    dijets.push_back(dijet);
+    diquarks.push_back(diquark);
+    // lepton2 + genjet
+    lep2jets.push_back(lepton2[0] + dijets[0]);
+    dilep2jets.push_back(lepton2[0] + lepton2[0] + dijets[0]);
+    lv2jets.push_back( l2v2[0] + dijets[0]);
+    // lepton2 + quark
+    lep2quarks.push_back(lepton2[0] + diquarks[0]);
+    dilep2quarks.push_back(lepton2[0] + lepton2[0] + diquarks[0]);
+    lv2quarks.push_back( l2v2[0] + diquarks[0]);
+  }
   // 
   //////////////////////////////////////////////////////////
   // evaluation 
@@ -338,6 +357,7 @@ void analysis() {
   Gen_nlepton1->Fill( lepton1.size() );
   Gen_nlepton2->Fill( lepton2.size() );
   Gen_nWquark->Fill( Wquark.size() );
+  Gen_nWQuark->Fill( GenQuark.size() );
   Gen_njet->Fill( genjet.size() );
   Gen_nWboson->Fill( Wboson.size() );
   Gen_nWHboson->Fill( WHboson.size() );
@@ -365,6 +385,7 @@ void analysis_Terminate(){
   Gen_nlepton1->Write();
   Gen_nlepton2->Write();
   Gen_nWquark->Write();
+  Gen_nWQuark->Write();
   Gen_njet->Write();
   Gen_nWboson->Write();
   Gen_nWHboson->Write();
