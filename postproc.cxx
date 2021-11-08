@@ -1,26 +1,4 @@
-#include "ROOT/RDataFrame.hxx"
-#include "ROOT/RDFHelpers.hxx"
-#include "ROOT/RVec.hxx"
-
-#include "Math/Vector4D.h"
-#include "TStopwatch.h"
-
-#include <iostream>
-#include <sstream>
-#include <fstream>
-#include <stdlib.h>
-#include <string>
-#include <vector>
-#include <cmath>
-#include <map>
-
-#include "utility" // std::pair
-#include <algorithm> // for std::find
-#include <iterator> // for std::begin, std::end
-#include <thread>
-
-//#include "TRandom3.h"
-#include "TLorentzVector.h"
+#include "postproc.h"
 
 int main() {
 
@@ -40,11 +18,13 @@ int main() {
   std::map< std::string, std::vector<std::string> > dataframes;
   std::string str1, str2;
 
-  while ( std::getline( file1 , str1 ) ) { infiles_1.push_back( "root://eosuser.cern.ch//"+str ); }
+  while ( std::getline( file1 , str1 ) ) { infiles_1.push_back( "root://eosuser.cern.ch//" + str1 ); }
   dataframes["sherpa"] = infiles_1;
 
-  while ( std::getline( file2 , str2 ) ) { infiles_2.push_back( "root://xrootd.ba.infn.it//"+str ); }
+  while ( std::getline( file2 , str2 ) ) { infiles_2.push_back( "root://xrootd.ba.infn.it//" + str2 ); }
   dataframes["powheg"] = infiles_2;
+
+  
 
   //
   
