@@ -1,12 +1,8 @@
-
-int boson[3]   = { 24 , -24 };
-//int parton[8] = { 1, -1, 2, -2, 3, -3, 4, -4 };
-int parton[11] = { 1, -1, 2, -2, 3, -3, 4, -4 , 5 , -5 }; //21
-int lepton[4]  = { 11, -11, 13, -13 };
-int neutrino[6] = { 12 , -12 , 14 , -14 , 16 , -16 };
+#ifndef GENPART_H
+#define GENPART_H
 
 template<typename T>
-auto mkGen( T &df ) {
+auto mkGenpart( T &df ) {
   using namespace ROOT::VecOps;
   
   //vector< vector<TLorentzVector> , vector<TLorentzVector> > out;
@@ -83,3 +79,5 @@ auto mkGen( T &df ) {
   
   return dfout;
 }
+
+#endif

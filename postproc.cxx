@@ -1,4 +1,6 @@
 #include "postproc.h"
+#include "genpart.h"
+#include "genjets.h"
 
 int main() {
   
@@ -19,7 +21,8 @@ int main() {
     {
       cout << "--> name : " << name << endl;
       ROOT::RDF::RNode rdff(rdf);
-      auto df1 = mkGen( rdff );
+      auto df1 = mkGenpart( rdff );
+      auto df2 = mkGenjet( df1 );
       
     }
   cout << endl;
