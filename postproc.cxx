@@ -1,92 +1,114 @@
 #include "postproc.h"
 
-int main() {
+int boson[3]   = { 24 , -24 };
+//int parton[8] = { 1, -1, 2, -2, 3, -3, 4, -4 };
+int parton[11] = { 1, -1, 2, -2, 3, -3, 4, -4 , 5 , -5 }; //21
+int lepton[4]  = { 11, -11, 13, -13 };
+int neutrino[6] = { 12 , -12 , 14 , -14 , 16 , -16 };
 
+template<typename T>
+auto mkGen( T &df ) {
+  using namespace ROOT::VecOps;
+  
+  //vector< vector<TLorentzVector> , vector<TLorentzVector> > out;
+  std::pair< vector<TLorentzVector> , vector<TLorentzVector> > out;
+  
+  // lambda function
+  auto eval = [&](
+		  int nGenPart_,
+		  RVec<float>& GenPart_eta_,
+		  RVec<float>& GenPart_mass_,
+		  RVec<float>& GenPart_phi_,
+		  RVec<float>& GenPart_pt_,
+		  RVec<int>& GenPart_genPartIdxMother_,
+		  RVec<int>& GenPart_pdgId_,
+		  RVec<int>& GenPart_status_,
+		  RVec<int>& GenPart_statusFlags_
+		  ){
+    // pt,eta,phi,mass for leading pt of lepton; lepton; w1 ; w2 ; ww
+    TLorentzVector VX,VXX;
+    vector<TLorentzVector> Leptons, Bosons;
+    for ( int i = 0 ; i < nGenPart_ ; i++ ){
+      VX.SetPtEtaPhiM(0.,0.,0.,0.);
+      VXX.SetPtEtaPhiM(0.,0.,0.,0.);
+      if ( !( std::find( std::begin( lepton ), std::end( lepton ), GenPart_pdgId_[i] ) != std::end( lepton ) ) ) continue;
+      // fromHardProcess
+      if ( !(GenPart_statusFlags_[i] >> 8 & 1) ) continue;
+      // isPrompt
+      if ( !(GenPart_statusFlags_[i] & 1) ) continue;
+      // status == 1
+      if (GenPart_status_[i] != 1) continue;
+      
+      VX.SetPtEtaPhiM( GenPart_pt_[i] , GenPart_eta_[i] , GenPart_phi_[i] , GenPart_mass_[i] );
+      int monIdx = GenPart_genPartIdxMother_[i];
+      int monpdgid = GenPart_pdgId_[monIdx];
+      
+      //check mon
+      Bool_t isW=false;
+      while ( monIdx > 0 ){
+	monpdgid = GenPart_pdgId_[monIdx];
+	// break while loop if W mom is found for the lepton
+	if ( abs(monpdgid) == 24 && GenPart_status_[monIdx] == 62 ) {
+	  VXX.SetPtEtaPhiM( GenPart_pt_[monIdx] , GenPart_eta_[monIdx] , GenPart_phi_[monIdx] , GenPart_mass_[monIdx] );
+	  Bosons.push_back(VXX);
+	  isW=true;
+	  break;
+	}
+	monIdx = GenPart_genPartIdxMother_[monIdx];
+      }
+      if (isW) Leptons.push_back(VX);  
+    }
+    // sorting in descending pt
+    Leptons = IndexByPt( Leptons );
+    Bosons = IndexByPt( Bosons );
+    out = std::make_pair( Leptons , Bosons );
+    return out;
+  };
+
+  auto dfout = df
+    .Define( "vector_out" , eval , {
+	"nGenPart",
+	  "GenPart_eta",
+	  "GenPart_mass",
+	  "GenPart_phi",
+	  "GenPart_pt",
+	  "GenPart_genPartIdxMother",
+	  "GenPart_pdgId",
+	  "GenPart_status",
+	  "GenPart_statusFlags"
+	  }
+      )
+    .Define( "leptons" , "vector_out.first" )
+    .Define( "bosons" , "vector_out.second" )
+    ;
+  
+  return dfout;
+}
+
+int main() {
+  
   //may return 0 when not able to detect   
   const auto processor_count = std::thread::hardware_concurrency();
   
-  std::cout << "ncpu detected : " << processor_count << ", using it all!" << std::endl;
-  ROOT::EnableImplicitMT(processor_count);
+  cout << "ncpu detected : " << processor_count << ", using it all!" << endl;
+  EnableImplicitMT(processor_count);
 
   // Initialize time
   TStopwatch time;
   time.Start();
 
   // filelist
-  std::vector<std::string> infiles_1, infiles_2;
-  std::ifstream file1("./data/samplelist_WWjets_sherpa.txt"), file2("./data/samplelist_WWjets_powheg.txt") ;
-  std::map< std::string, std::vector<std::string> > dataframes;
-  std::string str1, str2;
-
-  while ( std::getline( file1 , str1 ) ) { infiles_1.push_back( "root://eosuser.cern.ch//" + str1 ); }
-  dataframes["sherpa"] = infiles_1;
-
-  while ( std::getline( file2 , str2 ) ) { infiles_2.push_back( "root://xrootd.ba.infn.it//" + str2 ); }
-  dataframes["powheg"] = infiles_2;
-
+  Mapdf dataframes = mapDataframe(  "./data/samplelist_WWjets_sherpa.txt" , "./data/samplelist_WWjets_powheg.txt" );
   
-
-  //
-  
-  /*
-  if (mycfg.isMC) {
-    // set path
-    Helper::leptonID(mycfg);
-    // electron
-    makeSF_ele( mycfg.SF_files_map["electron"]["TightObjWP"][year]["idSF"] , mycfg.h_SF_ele );
-    makeSF_ele( mycfg.SF_files_map["electron"]["ttHMVA0p7"][year]["ttHMVA"] , mycfg.h_SF_ele_ttHMVA );
-    // muon
-    makeSF_muon( mycfg.SF_files_map["muon"]["TightObjWP"][year]["idSF"]  , mycfg.h_SF_mu_Id , "Muon_idSF2D" ); //  IdSF
-    makeSF_muon( mycfg.SF_files_map["muon"]["TightObjWP"][year]["isoSF"]  , mycfg.h_SF_mu_Iso , "Muon_isoSF2D" ); // IsoSF 
-    makeSF_muon( mycfg.SF_files_map["muon"]["ttHMVA0p8"][year]["ttHMVA"]  , mycfg.h_SF_mu_ttHMVA , "ttHMVA0p8_TightHWWCut" ); // tthMVA
-  }
-
-  ROOT::RDataFrame df( "Events", infiles );
-  auto df1 = twoLep_selection( df );  
-  //auto df1 = threeLep_selection( df );
-  auto df2 = df1.Filter("abs(Mll-91.2)<15" , "DY region : ( abs(mll-91.2)<15 )");
-  
-  // make lepton SF
-  auto outdf = hww_tthmva_sf( df2 , mycfg );
-
-  // staging out
-  std::vector<std::string> outbranch;
-  if ( name.find("Fake_") != std::string::npos ) {
-    outbranch = mycfg.outBranch[ "fake_" + year ];
-  }
-  else{
-    outbranch = mycfg.outBranch[ (mycfg.isMC) ? "mc_" + year : "data_" + year ];
-  }
-
-  outbranch.push_back( mycfg.HWW_WP[year] );
-  if (mycfg.isMC){
-    // gen-matching to prompt only (GenLepMatch2l matches to *any* gen lepton)
-    outdf = outdf.Define("gen_promptmatch" , "Lepton_promptgenmatched[0]*Lepton_promptgenmatched[1]");
-    
-    if ( name.find("DY") != std::string::npos ){
-      outdf = outdf.Define( "ptllDYW"    , ( name.find("LO") != std::string::npos ) ? mycfg.ptllDYW_LO[year] : mycfg.ptllDYW_NLO[year] );
-      outbranch.push_back( "ptllDYW" );
+  for ( const auto& [ name , rdf ] : dataframes )
+    {
+      cout << "--> name : " << name << endl;
+      ROOT::RDF::RNode rdff(rdf);
+      auto df1 = mkGen( rdff );
+      
     }
-    // push back sf lep
-    outbranch.push_back( mycfg.HWW_WP_SF[year] );
-  }
-  else{
-    std::string tname = name;
-    std::string s = "Fake_";
-    std::string::size_type iss = tname.find(s);
-    if (iss != std::string::npos)
-      tname.erase(iss, s.length());
-    std::cout<<"tname : "<< tname <<std::endl;
-    outdf = outdf.Define( "triggers" , mycfg.triggers[tname] );
-  }
+  cout << endl;
   
-  outdf.Snapshot( "flipper", output, outbranch );
-  
-  //ROOT::RDF::SaveGraph( outdf ,"graph_flip.dot");
-  
-  auto report = outdf.Report();
-  report->Print();
-  */
   time.Stop();
   time.Print();
 }

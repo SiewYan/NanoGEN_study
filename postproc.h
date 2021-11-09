@@ -3,7 +3,9 @@
 
 #include "ROOT/RDataFrame.hxx"
 #include "ROOT/RDFHelpers.hxx"
+//#include "ROOT/RDF/RInterface.hxx"
 #include "ROOT/RVec.hxx"
+#include "ROOT/RSnapshotOptions.hxx"
 
 #include "Math/Vector4D.h"
 #include "TStopwatch.h"
@@ -28,41 +30,95 @@
 //#include "AutoDict_vector_TLorentzVector_.cxx"
 //gInterpreter->GenerateDictionary("vector<TLorentzVector>", "vector"); 
 
-Float_t deltaPhi(Float_t phi1, Float_t phi2) {
-  Float_t PHI = fabs(phi1-phi2);
-  if (PHI<=3.14159265)
-    return PHI;
-  else
-    return 2*3.14159265-PHI;
+using namespace ROOT;
+//using RNode = ROOT::RDF::RNode;
+using namespace std;
+
+typedef map< string, RDataFrame > Mapdf;
+
+vector<string> listvar = {
+  "run",
+  "luminosityBlock",
+  "event",
+  "nGenJetAK8",
+  "GenJetAK8_eta",
+  "GenJetAK8_mass",
+  "GenJetAK8_phi",
+  "GenJetAK8_pt",
+  "nGenJet",
+  "GenJet_eta",
+  "GenJet_mass",
+  "GenJet_phi",
+  "GenJet_pt",
+  "nGenPart",
+  "GenPart_eta",
+  "GenPart_mass",
+  "GenPart_phi",
+  "GenPart_pt",
+  "GenPart_genPartIdxMother",
+  "GenPart_pdgId",
+  "GenPart_status",
+  "GenPart_statusFlags",
+  "Generator_scalePDF",
+  "Generator_weight",
+  "GenVtx_x",
+  "GenVtx_y",
+  "GenVtx_z",
+  "genWeight",
+  "nPSWeight",
+  "PSWeight",
+  "GenMET_phi",
+  "GenMET_pt",
+  "MET_fiducialGenPhi",
+  "MET_fiducialGenPt",
+  "nGenIsolatedPhoton",
+  "GenIsolatedPhoton_eta",
+  "GenIsolatedPhoton_mass",
+  "GenIsolatedPhoton_phi",
+  "GenIsolatedPhoton_pt",
+  "GenJetAK8_partonFlavour",
+  "GenJetAK8_hadronFlavour",
+  "GenJet_partonFlavour",
+  "GenJet_hadronFlavour"
+};
+
+// 
+Mapdf mapDataframe( string fsherpa , string fpowheg ) {
+
+  ifstream fin1( fsherpa.c_str() ), fin2( fpowheg.c_str() );
+  vector<string> infiles_1, infiles_2;
+  string str1, str2;
+  Mapdf mapout;
+  
+  while ( getline( fin1 , str1 ) ) { infiles_1.push_back( "root://eosuser.cern.ch//" + str1 ); }
+  while ( getline( fin2 , str2 ) ) { infiles_2.push_back( "root://xrootd.ba.infn.it//" + str2 ); }
+  RDataFrame df1( "Events" , infiles_1 ), df2( "Events" , infiles_2 );
+  //RNode rdf1(df1), rdf2(df2);
+  
+  mapout.insert( { "sherpa" , df1 } );
+  mapout.insert( { "powheg" , df2 } );
+  
+  return mapout;
+  
 }
 
-Float_t deltaR(Float_t phi1, Float_t eta1, Float_t phi2, Float_t eta2) {
-  //return sqrt((eta2-eta1)**2+deltaPhi(phi1,phi2)**2);                                                                                                                                  
-  return sqrt( pow((eta2-eta1),2) + pow(deltaPhi(phi1,phi2),2) );
-}
+auto add_p4 = [](float pt, float eta, float phi)
+{
+  return Math::PtEtaPhiMVector(pt, eta, phi, 0.);
+};
 
-Float_t deltaEta(Float_t eta1, Float_t eta2) {
-  return fabs(eta1 - eta2);
-}
+auto pair = [](Math::PtEtaPhiMVector& p4_1, Math::PtEtaPhiMVector& p4_2)
+{
+  return vector<float>( { float((p4_1+p4_2).Pt()) , float((p4_1+p4_2).Eta()) , float((p4_1+p4_2).Phi()) , float((p4_1+p4_2).M()) } );
+};
 
 struct ptsorter {
   bool operator() (TLorentzVector i, TLorentzVector j) { return ( (i.Pt()) > (j.Pt()) ); } // sort in Descending order                                         
 };
 
-struct minR {
-  bool operator() (std::pair<std::pair<TLorentzVector,TLorentzVector>, std::pair<Float_t,Int_t>> i, std::pair<std::pair<TLorentzVector,TLorentzVector>, std::pair<Float_t,Int_t>> j) { return ( (i.second.first) < (j.second.first) ); } // sort in Ascending order
-};
-
-std::vector<TLorentzVector> IndexByPt( std::vector<TLorentzVector> vector ){
+vector<TLorentzVector> IndexByPt( vector<TLorentzVector> vector ){
   ptsorter comparator;
-  std::sort (vector.begin() , vector.end() , comparator);
-  return vector;
-}
-
-std::vector<std::pair<std::pair<TLorentzVector,TLorentzVector>, std::pair<Float_t,Int_t>>> IndexBydR(std::vector<std::pair<std::pair<TLorentzVector,TLorentzVector>, std::pair<Float_t,Int_t>>> vector){
-  minR comparator;
-
-  std::sort (vector.begin() , vector.end() , comparator);
+  sort (vector.begin() , vector.end() , comparator);
   return vector;
 }
 
