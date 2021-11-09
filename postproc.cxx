@@ -18,16 +18,29 @@ int main() {
   // filelist
   Mapdf dataframes = mapDataframe(  "./data/samplelist_WWjets_sherpa.txt" , "./data/samplelist_WWjets_powheg.txt" );
   
+  // apply transformation
   for ( const auto& [ name , rdf ] : dataframes )
     {
-      cout << "--> name : " << name << endl;
+      cout << "--> applying transformations on sample : " << name << endl;
       ROOT::RDF::RNode rdff(rdf);
       auto df1 = mkGenpart( rdff );
       auto df2 = mkGenjet( df1 );
       auto df3 = mkDressedLepton( df2 );
     }
-  cout << endl;
-  
-  time.Stop();
-  time.Print();
+
+  // apply action
+  for ( const auto& [ name , rdf ] : dataframes )
+    { 
+      cout << "--> applying action on sample : " << name << endl;
+      ROOT::RDF::RNode rdff(rdf);
+      auto defColNames = rdff.GetDefinedColumnNames();
+      rdff.Snapshot( "trimmed", name + ".root" , defColNames );
+      ROOT::RDF::SaveGraph( rdff ,"graph_flip.dot");
+      auto report = rdff.Report();
+      report->Print();
+
+      cout << endl;
+      time.Stop();
+      time.Print();
+    }
 }
