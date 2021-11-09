@@ -1,6 +1,7 @@
 #include "postproc.h"
 #include "genpart.h"
 #include "genjets.h"
+#include "dressedlepton.h"
 
 int main() {
   
@@ -23,7 +24,7 @@ int main() {
       ROOT::RDF::RNode rdff(rdf);
       auto df1 = mkGenpart( rdff );
       auto df2 = mkGenjet( df1 );
-      
+      auto df3 = mkDressedLepton( df2 );
     }
   cout << endl;
   
