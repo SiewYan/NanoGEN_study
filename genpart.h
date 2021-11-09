@@ -10,7 +10,6 @@ auto mkGenpart( T &df ) {
   
   // lambda function
   auto eval = [&](
-		  int nGenPart_,
 		  RVec<float>& GenPart_eta_,
 		  RVec<float>& GenPart_mass_,
 		  RVec<float>& GenPart_phi_,
@@ -22,8 +21,9 @@ auto mkGenpart( T &df ) {
 		  ){
     // pt,eta,phi,mass for leading pt of lepton; lepton; w1 ; w2 ; ww
     TLorentzVector VX,VXX;
+    int nGenPart_ = GenPart_pt_.size();
     vector<TLorentzVector> Leptons, Bosons;
-    for ( int i = 0 ; i < nGenPart_ ; i++ ){
+    for ( auto i = 0 ; i < nGenPart_ ; i++ ){
       VX.SetPtEtaPhiM(0.,0.,0.,0.);
       VXX.SetPtEtaPhiM(0.,0.,0.,0.);
       if ( !( std::find( std::begin( lepton ), std::end( lepton ), GenPart_pdgId_[i] ) != std::end( lepton ) ) ) continue;
@@ -61,8 +61,7 @@ auto mkGenpart( T &df ) {
   };
 
   auto dfout = df
-    .Define( "vector_out" , eval , {
-	"nGenPart",
+    .Define( "genpart" , eval , {
 	  "GenPart_eta",
 	  "GenPart_mass",
 	  "GenPart_phi",
@@ -73,8 +72,8 @@ auto mkGenpart( T &df ) {
 	  "GenPart_statusFlags"
 	  }
       )
-    .Define( "leptons" , "vector_out.first" )
-    .Define( "bosons" , "vector_out.second" )
+    .Define( "leptons" , "genpart.first" )
+    .Define( "bosons" , "genpart.second" )
     ;
   
   return dfout;

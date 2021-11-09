@@ -21,22 +21,18 @@ int main() {
   // apply transformation
   for ( const auto& [ name , rdf ] : dataframes )
     {
+      if ( name != "sherpa" ) continue;
       cout << "--> applying transformations on sample : " << name << endl;
       ROOT::RDF::RNode rdff(rdf);
       auto df1 = mkGenpart( rdff );
       auto df2 = mkGenjet( df1 );
       auto df3 = mkDressedLepton( df2 );
-    }
-
-  // apply action
-  for ( const auto& [ name , rdf ] : dataframes )
-    { 
-      cout << "--> applying action on sample : " << name << endl;
-      ROOT::RDF::RNode rdff(rdf);
-      auto defColNames = rdff.GetDefinedColumnNames();
-      rdff.Snapshot( "trimmed", name + ".root" , defColNames );
-      ROOT::RDF::SaveGraph( rdff ,"graph_flip.dot");
-      auto report = rdff.Report();
+      
+      cout << "--> applying actions on sample : " << name << endl;
+      auto defColNames = df3.GetDefinedColumnNames();
+      rdff.Snapshot( "trimmed", name + ".root" , branchout ); //defColNames );
+      ROOT::RDF::SaveGraph( df3 ,"graph_flip.dot");
+      auto report = df3.Report();
       report->Print();
 
       cout << endl;

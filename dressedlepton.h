@@ -13,7 +13,6 @@ auto mkDressedLepton( T &df ) {
   
   // lambda function
   auto eval = [&](
-		  int nGenDressedLepton_,
 		  RVec<float>& GenDressedLepton_eta_,
 		  RVec<float>& GenDressedLepton_mass_,
 		  RVec<float>& GenDressedLepton_phi_,
@@ -23,8 +22,8 @@ auto mkDressedLepton( T &df ) {
     // take final state jet, and sorted it according to descending pt
     TLorentzVector dressedleptons;
     vector<TLorentzVector> DressedLeptons;
-    //AK4
-    for ( int i = 0 ; i < nGenDressedLepton_ ; i++ ){
+    int nGenDressedLepton_ = GenDressedLepton_pt_.size();
+    for ( auto i = 0 ; i < nGenDressedLepton_ ; i++ ){
       dressedleptons.SetPtEtaPhiM(0.,0.,0.,0.);
       if ( !( std::find( std::begin( lepton ), std::end( lepton ), GenDressedLepton_pdgId_[i] ) != std::end( lepton ) ) ) continue;
       
@@ -39,7 +38,6 @@ auto mkDressedLepton( T &df ) {
 
   auto dfout = df
     .Define( "DressedLepton" , eval , {
-	"nGenDressedLepton",
 	  "GenDressedLepton_eta",
 	  "GenDressedLepton_mass",
 	  "GenDressedLepton_phi",

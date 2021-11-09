@@ -16,40 +16,41 @@ auto mkGenjet( T &df ) {
   
   // lambda function
   auto eval = [&](
-		  int nGenJetAK8_,
 		  RVec<float>& GenJetAK8_eta_,
 		  RVec<float>& GenJetAK8_mass_,
 		  RVec<float>& GenJetAK8_phi_,
 		  RVec<float>& GenJetAK8_pt_,
-		  int nGenJet_,
 		  RVec<float>& GenJet_eta_,
 		  RVec<float>& GenJet_mass_,
 		  RVec<float>& GenJet_phi_,
 		  RVec<float>& GenJet_pt_,
 		  RVec<int>& GenJetAK8_partonFlavour_,
-		  RVec<int>& GenJetAK8_hadronFlavour_,
+		  RVec<unsigned char>& GenJetAK8_hadronFlavour_,
 		  RVec<int>& GenJet_partonFlavour_,
-		  RVec<int>& GenJet_hadronFlavour_
+		  RVec<unsigned char>& GenJet_hadronFlavour_
 		  ){
     // take final state jet, and sorted it according to descending pt
     TLorentzVector Ak4jet,Ak8jet;
     vector<TLorentzVector> GenJetsAK4, GenJetsAK8;
+    int nGenJetAK8_ = GenJetAK8_pt_.size();
+    int nGenJet_ = GenJet_pt_.size();
+    
     //AK4
-    for ( int i = 0 ; i < nGenJet_ ; i++ ){
+    for ( auto i = 0 ; i < nGenJet_ ; i++ ){
       Ak4jet.SetPtEtaPhiM(0.,0.,0.,0.);
       if ( !( std::find( std::begin( parton ), std::end( parton ), GenJet_partonFlavour_[i] ) != std::end( parton ) ) ) continue;
       
-      if ( !(GenJet_hadronFlavour_[i] == 0) ) continue;
+      //if ( !(GenJet_hadronFlavour_[i] == 0) ) continue;
       
       Ak4jet.SetPtEtaPhiM( GenJet_pt_[i] , GenJet_eta_[i] , GenJet_phi_[i] , GenJet_mass_[i] );
       GenJetsAK4.push_back( Ak4jet );
     }
     //AK8
-    for ( int i = 0 ; i < nGenJetAK8_ ; i++ ){
+    for ( auto i = 0 ; i < nGenJetAK8_ ; i++ ){
       Ak8jet.SetPtEtaPhiM(0.,0.,0.,0.);
       if ( !( std::find( std::begin( parton ), std::end( parton ), GenJetAK8_partonFlavour_[i] ) != std::end( parton ) ) ) continue;
       
-      if ( !(GenJetAK8_hadronFlavour_[i] == 0) ) continue;
+      //if ( !(GenJetAK8_hadronFlavour_[i] == 0) ) continue;
 
       Ak8jet.SetPtEtaPhiM( GenJetAK8_pt_[i] , GenJetAK8_eta_[i] , GenJetAK8_phi_[i] , GenJetAK8_mass_[i] );
       GenJetsAK8.push_back( Ak8jet);
@@ -64,12 +65,10 @@ auto mkGenjet( T &df ) {
 
   auto dfout = df
     .Define( "genjet" , eval , {
-	"nGenJetAK8",
 	  "GenJetAK8_eta",
 	  "GenJetAK8_mass",
 	  "GenJetAK8_phi",
 	  "GenJetAK8_pt",
-	  "nGenJet",
 	  "GenJet_eta",
 	  "GenJet_mass",
 	  "GenJet_phi",
