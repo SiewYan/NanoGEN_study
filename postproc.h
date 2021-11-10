@@ -26,12 +26,13 @@
 
 //#include "TRandom3.h" 
 #include "TLorentzVector.h"
-//#include <TInterpreter.h>
+#include <TInterpreter.h>
+
+//gInterpreter->GenerateDictionary( "vector<TLorentzVector>" , "vector" );
 //#include "AutoDict_vector_TLorentzVector_.cxx"
-//gInterpreter->GenerateDictionary("vector<TLorentzVector>", "vector"); 
 
 using namespace ROOT;
-//using RNode = ROOT::RDF::RNode;
+using RNode = ROOT::RDF::RNode;
 using namespace std;
 
 typedef map< string, RDataFrame > Mapdf;
@@ -69,6 +70,17 @@ Mapdf mapDataframe( string fsherpa , string fpowheg ) {
   
 }
 
+struct ptsorter {
+  bool operator() (TLorentzVector i, TLorentzVector j) { return ( (i.Pt()) > (j.Pt()) ); } // sort in Descending order                                         
+};
+
+vector<TLorentzVector> IndexByPt( vector<TLorentzVector> vector ){
+  ptsorter comparator;
+  sort (vector.begin() , vector.end() , comparator);
+  return vector;
+}
+
+// lambda function
 auto add_p4 = [](float pt, float eta, float phi)
 {
   return Math::PtEtaPhiMVector(pt, eta, phi, 0.);
@@ -79,14 +91,10 @@ auto pair = [](Math::PtEtaPhiMVector& p4_1, Math::PtEtaPhiMVector& p4_2)
   return vector<float>( { float((p4_1+p4_2).Pt()) , float((p4_1+p4_2).Eta()) , float((p4_1+p4_2).Phi()) , float((p4_1+p4_2).M()) } );
 };
 
-struct ptsorter {
-  bool operator() (TLorentzVector i, TLorentzVector j) { return ( (i.Pt()) > (j.Pt()) ); } // sort in Descending order                                         
-};
+//auto unp4 = [](TLorentzVector p4)
+//{
+//  return Math::PtEtaPhiMVector(pt, eta, phi, 0.);
+//};
 
-vector<TLorentzVector> IndexByPt( vector<TLorentzVector> vector ){
-  ptsorter comparator;
-  sort (vector.begin() , vector.end() , comparator);
-  return vector;
-}
 
 #endif

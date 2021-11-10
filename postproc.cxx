@@ -23,15 +23,16 @@ int main() {
     {
       if ( name != "sherpa" ) continue;
       cout << "--> applying transformations on sample : " << name << endl;
-      ROOT::RDF::RNode rdff(rdf);
+      RNode rdff(rdf);
       auto df1 = mkGenpart( rdff );
-      auto df2 = mkGenjet( df1 );
-      auto df3 = mkDressedLepton( df2 );
+      //auto df2 = mkGenjet( df1 );
+      //auto df3 = mkDressedLepton( df2 );
+      auto df3 = df1;
       
       cout << "--> applying actions on sample : " << name << endl;
       auto defColNames = df3.GetDefinedColumnNames();
-      rdff.Snapshot( "trimmed", name + ".root" , branchout ); //defColNames );
-      ROOT::RDF::SaveGraph( df3 ,"graph_flip.dot");
+      df3.Snapshot( "flatten" , name + ".root" , { "Lepton1_Pt" } ); //branchout ); //defColNames );
+      ROOT::RDF::SaveGraph( df3 ,"graph_postproc.dot");
       auto report = df3.Report();
       report->Print();
 
