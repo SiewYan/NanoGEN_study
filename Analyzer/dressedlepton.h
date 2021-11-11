@@ -20,8 +20,8 @@ auto mkDressedLepton( T &df ) {
 		  RVec<int>& GenDressedLepton_pdgId_
 		  ){
     // take final state jet, and sorted it according to descending pt
-    TLorentzVector dressedleptons;
-    vector<TLorentzVector> DressedLeptons;
+    Math::PtEtaPhiMVector dressedleptons;
+    vector<Math::PtEtaPhiMVector> DressedLeptons;
     int nGenDressedLepton_ = GenDressedLepton_pt_.size();
     for ( auto i = 0 ; i < nGenDressedLepton_ ; i++ ){
       dressedleptons.SetPtEtaPhiM(0.,0.,0.,0.);

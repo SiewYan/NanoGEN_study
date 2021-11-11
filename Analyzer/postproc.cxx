@@ -1,7 +1,7 @@
 #include "postproc.h"
 #include "genpart.h"
-#include "genjets.h"
-#include "dressedlepton.h"
+//#include "genjets.h"
+//#include "dressedlepton.h"
 
 int main() {
   
@@ -21,21 +21,34 @@ int main() {
   // apply transformation
   for ( const auto& [ name , rdf ] : dataframes )
     {
-      if ( name != "sherpa" ) continue;
+      if ( name != "powheg" ) continue;
       cout << "--> applying transformations on sample : " << name << endl;
       RNode rdff(rdf);
-      auto df1 = mkGenpart( rdff );
+      auto df1 = mkGenpart( rdff , name );
       //auto df2 = mkGenjet( df1 );
       //auto df3 = mkDressedLepton( df2 );
       auto df3 = df1;
       
       cout << "--> applying actions on sample : " << name << endl;
       auto defColNames = df3.GetDefinedColumnNames();
-      df3.Snapshot( "flatten" , name + ".root" , { "Lepton1_Pt" } ); //branchout ); //defColNames );
+      
+      defColNames.erase( 
+			std::remove_if(
+				       defColNames.begin(), 
+				       defColNames.end(),
+				       isOut
+				       ),
+			defColNames.end()
+			 );
+      
+      for( auto f : defColNames ) cout<<" --> "<<f<<endl;
+
+      df3.Snapshot( "flat" , name + ".root" , defColNames );
+      
       ROOT::RDF::SaveGraph( df3 ,"graph_postproc.dot");
       auto report = df3.Report();
       report->Print();
-
+      
       cout << endl;
       time.Stop();
       time.Print();

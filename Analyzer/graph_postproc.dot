@@ -1,0 +1,11 @@
+digraph {
+	2 [label="filtering out event with less than 2 leptons", style="filled", fillcolor="#c4cfd4", shape="diamond"];
+	3 [label="Define
+genpart_out", style="filled", fillcolor="#60aef3", shape="oval"];
+	4 [label="Define
+nlepton", style="filled", fillcolor="#60aef3", shape="oval"];
+	0 [label="Events", style="filled", fillcolor="#e8f8fc", shape="oval"];
+	3 -> 2;
+	4 -> 3;
+	0 -> 4;
+}

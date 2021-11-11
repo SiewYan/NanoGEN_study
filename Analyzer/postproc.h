@@ -26,10 +26,11 @@
 
 //#include "TRandom3.h" 
 #include "TLorentzVector.h"
-#include <TInterpreter.h>
+//#include <TInterpreter.h>
 
 //gInterpreter->GenerateDictionary( "vector<TLorentzVector>" , "vector" );
 //#include "AutoDict_vector_TLorentzVector_.cxx"
+//#include "AutoDict_vector_PtEtaPhiMVector_.cxx"
 
 using namespace ROOT;
 using RNode = ROOT::RDF::RNode;
@@ -59,7 +60,7 @@ Mapdf mapDataframe( string fsherpa , string fpowheg ) {
   Mapdf mapout;
   
   while ( getline( fin1 , str1 ) ) { infiles_1.push_back( "root://eosuser.cern.ch//" + str1 ); }
-  while ( getline( fin2 , str2 ) ) { infiles_2.push_back( "root://xrootd.ba.infn.it//" + str2 ); }
+  while ( getline( fin2 , str2 ) ) { infiles_2.push_back( "root://eosuser.cern.ch//" + str2 ); }
   RDataFrame df1( "Events" , infiles_1 ), df2( "Events" , infiles_2 );
   //RNode rdf1(df1), rdf2(df2);
   
@@ -71,14 +72,18 @@ Mapdf mapDataframe( string fsherpa , string fpowheg ) {
 }
 
 struct ptsorter {
-  bool operator() (TLorentzVector i, TLorentzVector j) { return ( (i.Pt()) > (j.Pt()) ); } // sort in Descending order                                         
+  bool operator() ( std::pair< Math::PtEtaPhiMVector , int > i, std::pair< Math::PtEtaPhiMVector , int > j) { return ( (i.first.Pt()) > (j.first.Pt()) ); } // sort in Descending order                                         
 };
 
-vector<TLorentzVector> IndexByPt( vector<TLorentzVector> vector ){
+vector< std::pair< Math::PtEtaPhiMVector , int > > IndexByPt( vector< std::pair< Math::PtEtaPhiMVector , int > > vector ){
   ptsorter comparator;
   sort (vector.begin() , vector.end() , comparator);
   return vector;
 }
+
+auto isOut = [](string x){ 
+  return x.find("_out") != std::string::npos;
+};
 
 // lambda function
 auto add_p4 = [](float pt, float eta, float phi)

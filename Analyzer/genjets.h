@@ -12,7 +12,7 @@ auto mkGenjet( T &df ) {
   using namespace ROOT::VecOps;
   
   //vector< vector<TLorentzVector> , vector<TLorentzVector> > out;
-  std::pair< vector<TLorentzVector> , vector<TLorentzVector> > out;
+  std::pair< vector<Math::PtEtaPhiMVector> , vector<Math::PtEtaPhiMVector> > out;
   
   // lambda function
   auto eval = [&](
@@ -30,8 +30,8 @@ auto mkGenjet( T &df ) {
 		  RVec<unsigned char>& GenJet_hadronFlavour_
 		  ){
     // take final state jet, and sorted it according to descending pt
-    TLorentzVector Ak4jet,Ak8jet;
-    vector<TLorentzVector> GenJetsAK4, GenJetsAK8;
+    Math::PtEtaPhiMVector Ak4jet,Ak8jet;
+    vector<Math::PtEtaPhiMVector> GenJetsAK4, GenJetsAK8;
     int nGenJetAK8_ = GenJetAK8_pt_.size();
     int nGenJet_ = GenJet_pt_.size();
     
