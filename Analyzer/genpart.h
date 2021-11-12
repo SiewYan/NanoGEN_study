@@ -34,7 +34,10 @@ auto mkGenpart( T &df , const string &name ) {
       //if ( ( GenPart_status_[i] != 1 && name == "powheg" ) || 
       //	   ( GenPart_status_[i] != 3 && name == "sherpa" )
       //   ) continue;
-      if ( GenPart_status_[i] != 1 ) continue;
+      if ( 
+	  ( GenPart_status_[i] != 1 && name == "powheg" ) || 
+	  ( GenPart_status_[i] != 3 && name == "sherpa" )
+	   ) continue;
       
       Math::PtEtaPhiMVector VX( GenPart_pt_[i] , GenPart_eta_[i] , GenPart_phi_[i] , GenPart_mass_[i] );
       out.push_back( std::make_pair( VX , GenPart_pdgId_[i] ) );      
