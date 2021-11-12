@@ -36,14 +36,14 @@ using namespace ROOT;
 using RNode = ROOT::RDF::RNode;
 using namespace std;
 
-typedef map< string, RDataFrame > Mapdf;
+//typedef map< string, RDataFrame > Mapdf;
+typedef map< string, RNode > Mapdf;
 
 int boson[3]   = { 24 , -24 };
 //int parton[8] = { 1, -1, 2, -2, 3, -3, 4, -4 };
 int parton[11] = { 1, -1, 2, -2, 3, -3, 4, -4 , 5 , -5 }; //21 
 int lepton[4]  = { 11, -11, 13, -13 };
 int neutrino[6] = { 12 , -12 , 14 , -14 , 16 , -16 };
-
 
 vector<string> branchout = {
   "run",
@@ -52,23 +52,23 @@ vector<string> branchout = {
 };
 
 // 
-Mapdf mapDataframe( string fsherpa , string fpowheg ) {
+Mapdf mapDataframe( map<string,string> mapin ) {
 
-  ifstream fin1( fsherpa.c_str() ), fin2( fpowheg.c_str() );
-  vector<string> infiles_1, infiles_2;
-  string str1, str2;
   Mapdf mapout;
+
+  for (const auto& [name, filelist] : mapin) {
+
+    ifstream fin1( filelist.c_str() );
+    vector<string> infiles;
+    string str;
+    while ( getline( fin1 , str ) ) { infiles.push_back( "root://eosuser.cern.ch//" + str ); }    
+
+    RDataFrame df( "Events" , infiles );
+    
+    mapout.insert( { name , df } );
+  }
   
-  while ( getline( fin1 , str1 ) ) { infiles_1.push_back( "root://eosuser.cern.ch//" + str1 ); }
-  while ( getline( fin2 , str2 ) ) { infiles_2.push_back( "root://eosuser.cern.ch//" + str2 ); }
-  RDataFrame df1( "Events" , infiles_1 ), df2( "Events" , infiles_2 );
-  //RNode rdf1(df1), rdf2(df2);
-  
-  mapout.insert( { "sherpa" , df1 } );
-  mapout.insert( { "powheg" , df2 } );
-  
-  return mapout;
-  
+  return mapout;  
 }
 
 struct ptsorter {
@@ -81,9 +81,26 @@ vector< std::pair< Math::PtEtaPhiMVector , int > > IndexByPt( vector< std::pair<
   return vector;
 }
 
-auto isOut = [](string x){ 
+auto isOut = [](string x){
   return x.find("_out") != std::string::npos;
 };
+
+auto mkoutput( RNode df ){
+  
+  auto defColNames = df.GetDefinedColumnNames();
+  defColNames.erase(
+		    std::remove_if(
+				   defColNames.begin(),
+				   defColNames.end(),
+				   isOut
+				   ),
+		    defColNames.end()
+		    );
+  
+  cout<<" --> output variables : "<<endl;
+  for( auto f : defColNames ) cout<<" --> "<<f<<endl;
+  return defColNames;
+}
 
 // lambda function
 auto add_p4 = [](float pt, float eta, float phi)

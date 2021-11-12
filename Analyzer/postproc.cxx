@@ -15,42 +15,42 @@ int main() {
   TStopwatch time;
   time.Start();
 
-  // filelist
-  Mapdf dataframes = mapDataframe(  "./data/samplelist_WWjets_sherpa.txt" , "./data/samplelist_WWjets_powheg.txt" );
-  
+  // typedef map< string, RDataFrame >
+  Mapdf dataframes = mapDataframe(  
+				  { 
+				    { "sherpa" , "./data/samplelist_WWjets_sherpa.txt" } ,
+				      { "powheg" , "./data/samplelist_WWjets_powheg.txt" } 
+				  } );
+  Mapdf dataframes_;
   // apply transformation
   for ( const auto& [ name , rdf ] : dataframes )
     {
-      if ( name != "powheg" ) continue;
-      cout << "--> applying transformations on sample : " << name << endl;
+      //if ( name != "powheg" ) continue;
+      cout << "--> applying transformations : " << name << endl;
       RNode rdff(rdf);
       auto df1 = mkGenpart( rdff , name );
       //auto df2 = mkGenjet( df1 );
       //auto df3 = mkDressedLepton( df2 );
+      
       auto df3 = df1;
-      
-      cout << "--> applying actions on sample : " << name << endl;
-      auto defColNames = df3.GetDefinedColumnNames();
-      
-      defColNames.erase( 
-			std::remove_if(
-				       defColNames.begin(), 
-				       defColNames.end(),
-				       isOut
-				       ),
-			defColNames.end()
-			 );
-      
-      for( auto f : defColNames ) cout<<" --> "<<f<<endl;
+      dataframes_.insert( { name , df3 } );
+    }
 
-      df3.Snapshot( "flat" , name + ".root" , defColNames );
+  // apply action
+  
+  for ( const auto& [ name , rdf ] : dataframes_ )
+    {
+      cout << "--> applying actions : " << name << endl;
+      RNode rdff(rdf);
+      rdff.Snapshot( "flat" , name + ".root" , mkoutput(rdff) );
       
-      ROOT::RDF::SaveGraph( df3 ,"graph_postproc.dot");
-      auto report = df3.Report();
+      ROOT::RDF::SaveGraph( rdff ,"graph_"+name+"_postproc.dot" );
+      auto report = rdff.Report();
       report->Print();
       
       cout << endl;
-      time.Stop();
-      time.Print();
     }
+  
+  time.Stop();
+  time.Print();
 }

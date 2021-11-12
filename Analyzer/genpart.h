@@ -22,13 +22,10 @@ auto mkGenpart( T &df , const string &name ) {
     vector< std::pair< Math::PtEtaPhiMVector , int > > out;
     
     for ( auto i = 0 ; i < nGenPart_ ; i++ ){
-      // look at only first 4 candidates
-      //if ( i > 4 ) break;
       
-      //VX.SetPtEtaPhiM(0.,0.,0.,0.);
-      //VXX.SetPtEtaPhiM(0.,0.,0.,0.);
       if ( !( std::find( std::begin( lepton ), std::end( lepton ), GenPart_pdgId_[i] ) != std::end( lepton ) ) ) 
 	continue;
+      
       // fromHardProcess
       if ( !(GenPart_statusFlags_[i] >> 8 & 1) ) continue;
       // isPrompt
@@ -40,7 +37,6 @@ auto mkGenpart( T &df , const string &name ) {
       if ( GenPart_status_[i] != 1 ) continue;
       
       Math::PtEtaPhiMVector VX( GenPart_pt_[i] , GenPart_eta_[i] , GenPart_phi_[i] , GenPart_mass_[i] );
-	//VX.SetPtEtaPhiM( GenPart_pt_[i] , GenPart_eta_[i] , GenPart_phi_[i] , GenPart_mass_[i] );
       out.push_back( std::make_pair( VX , GenPart_pdgId_[i] ) );      
       
       /**
@@ -83,7 +79,7 @@ auto mkGenpart( T &df , const string &name ) {
 	  "GenPart_genPartIdxMother" , "GenPart_pdgId" , "GenPart_status" , "GenPart_statusFlags" }
       )
     .Define( "nlepton"       , "static_cast<int>(genpart_out.size())"         )
-    .Filter( "nlepton >=2"   , "filtering out event with less than 2 leptons" )
+    .Filter( "nlepton>=2"    , "filtering out event with less than 2 leptons" )
     .Define( "lepton1_Pt"    , "genpart_out[0].first.Pt()"                    )
     .Define( "lepton1_Eta"   , "genpart_out[0].first.Eta()"                   )
     .Define( "lepton1_Phi"   , "genpart_out[0].first.Phi()"                   )
