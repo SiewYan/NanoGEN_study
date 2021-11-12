@@ -1,7 +1,7 @@
-#include "postproc.h"
-#include "genpart.h"
-#include "genjets.h"
-//#include "dressedlepton.h"
+#include "analyzer/postproc.h"
+#include "analyzer/genpart.h"
+#include "analyzer/genjets.h"
+#include "analyzer/dressedlepton.h"
 
 int main() {
   
@@ -30,9 +30,8 @@ int main() {
       RNode rdff(rdf);
       auto df1 = mkGenpart( rdff , name );
       auto df2 = mkGenjet( df1 );
-      //auto df3 = mkDressedLepton( df2 );
+      auto df3 = mkDressedLepton( df2 );
       
-      auto df3 = df2;
       dataframes_.insert( { name , df3 } );
     }
 
@@ -44,10 +43,10 @@ int main() {
       RNode rdff(rdf);
       rdff.Snapshot( "flat" , name + ".root" , mkoutput(rdff) );
       
-      ROOT::RDF::SaveGraph( rdff ,"graph_"+name+".dot" );
+      ROOT::RDF::SaveGraph( rdff ,"./graphs/graph_"+name+".dot" );
       auto report = rdff.Report();
       report->Print();
-      
+
       cout << endl;
     }
   
