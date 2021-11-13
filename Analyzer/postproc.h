@@ -25,12 +25,11 @@
 #include <thread>
 
 //#include "TRandom3.h" 
-#include "TLorentzVector.h"
-//#include <TInterpreter.h>
+//#include "TLorentzVector.h"
+#include <TInterpreter.h>
+#include "mydict.cxx"
 
-//gInterpreter->GenerateDictionary( "vector<TLorentzVector>" , "vector" );
-//#include "AutoDict_vector_TLorentzVector_.cxx"
-//#include "AutoDict_vector_PtEtaPhiMVector_.cxx"
+//TInterpreter groot(); groot.GenerateDictionary( "vector<TLorentzVector>" , "vector" );
 
 using namespace ROOT;
 using RNode = ROOT::RDF::RNode;
@@ -73,21 +72,12 @@ Mapdf mapDataframe( map<string,string> mapin ) {
 
 //
 struct ptsorter {
-  bool operator() ( std::pair< Math::PtEtaPhiMVector , int > i, std::pair< Math::PtEtaPhiMVector , int > j) { return ( (i.first.Pt()) > (j.first.Pt()) ); } // sort in Descending order                                         
+  bool operator() ( std::pair< Math::PtEtaPhiMVector , int > i, std::pair< Math::PtEtaPhiMVector , int > j) { return ( (i.first.Pt()) > (j.first.Pt()) ); } // sort in Descending order
 };
 
 //
-vector< std::pair< Math::PtEtaPhiMVector , int > > IndexByPt( vector< std::pair< Math::PtEtaPhiMVector , int > > vector , const int Nout ){
-  ptsorter comparator;
-  sort (vector.begin() , vector.end() , comparator);
-
-  // add dummy
-  int vsize = static_cast<int>(vector.size());
-  if ( vsize < Nout ){
-    int ntimes = Nout - vsize;
-    for (int i=0 ; i < ntimes ; i++)
-      vector.push_back( std::make_pair( Math::PtEtaPhiMVector( -999. , -999. ,-999. , -999. )  , -999. ) );
-  }
+RVec< std::pair< Math::PtEtaPhiMVector , int > > IndexByPt( RVec< std::pair< Math::PtEtaPhiMVector , int > > vector ){
+  ptsorter comparator; sort (vector.begin() , vector.end() , comparator);
   return vector;
 }
 

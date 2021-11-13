@@ -2,7 +2,7 @@
 #define GENPART_H
 
 template<typename T>
-auto mkGenpart( T &df , const string &name , const int &nlep ) {
+auto mkGenpart( T &df , const string &name ) {
   using namespace ROOT::VecOps;
     
   // lambda function
@@ -17,9 +17,10 @@ auto mkGenpart( T &df , const string &name , const int &nlep ) {
 		  RVec<int>& GenPart_statusFlags_
 		  ){
     // pt,eta,phi,mass for leading pt of lepton; lepton; w1 ; w2 ; ww
-    int nGenPart_ = GenPart_pt_.size();
+    const int nGenPart_ = GenPart_pt_.size();
     
-    vector< std::pair< Math::PtEtaPhiMVector , int > > out;
+    //vector< std::pair< Math::PtEtaPhiMVector , int > > out;
+    RVec< std::pair<Math::PtEtaPhiMVector , int> > out;
     
     for ( auto i = 0 ; i < nGenPart_ ; i++ ){
       
@@ -69,30 +70,23 @@ auto mkGenpart( T &df , const string &name , const int &nlep ) {
       **/
       
     }
-        
-    return std::make_tuple( IndexByPt( out , nlep ) , static_cast<int>(out.size()) );
+
+    //flatten 
+    RVec<Math::PtEtaPhiMVector> fp ; RVec<int> id;
+    out = IndexByPt( out );
+    for ( auto thepair : out ) {
+      fp.push_back(thepair.first); id.push_back(thepair.second);
+    }
+    return std::make_tuple( fp , id );
   };
 
   auto dfout = df
-    .Define( "genparttuple_out" , eval , { "GenPart_eta" , "GenPart_mass" , "GenPart_phi" , "GenPart_pt" , 
+    .Define( "genpart_out" , eval , { "GenPart_eta" , "GenPart_mass" , "GenPart_phi" , "GenPart_pt" , 
 	  "GenPart_genPartIdxMother" , "GenPart_pdgId" , "GenPart_status" , "GenPart_statusFlags" }
       )
-    .Define( "genpart_out"   , "std::get<0>(genparttuple_out)"                )
-    .Define( "nlepton"       , "std::get<1>(genparttuple_out)"                )
+    .Define( "Lepton"        , "std::get<0>(genpart_out)"                )
+    .Define( "Lepton_pdgId"  , "std::get<1>(genpart_out)"                )
     ;
-  
-  for (auto i = 0; i < nlep; ++i){
-
-    dfout = dfout.Define( "lepton" + to_string(i+1) + "_pdgId" , 
-			  "genpart_out[" + to_string(i) + "].second" );
-    
-    // 4 vectors
-    for ( auto feature : { "Pt" , "Eta" , "Phi" , "M" } ) {
-      string var = "lepton" + to_string(i+1) + "_" + feature;
-      string def = "genpart_out[" + to_string(i) + "].first."+ feature +"()";
-      dfout = dfout.Define( var , def );
-    }
-  }
   
   return dfout;
 }

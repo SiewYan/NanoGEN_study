@@ -1,7 +1,7 @@
 #include "postproc.h"
 #include "analyzers/genpart.h"
-#include "analyzers/genjets.h"
-#include "analyzers/dressedlepton.h"
+//#include "analyzers/genjets.h"
+//#include "analyzers/dressedlepton.h"
 
 int main() {
   
@@ -18,18 +18,17 @@ int main() {
 				      { "powheg" , "./data/samplelist_WWjets_powheg.txt" } 
 				  } );
   Mapdf dataframes_;
-  const int npar =2;
   // apply transformation
   for ( const auto& [ name , rdf ] : dataframes )
     {
       //if ( name != "powheg" ) continue;
       cout << "--> applying transformations : " << name << endl;
       RNode rdff(rdf);
-      auto df1 = mkGenpart( rdff , name , npar );
-      auto df2 = mkGenjet( df1 , npar );
-      auto df3 = mkDressedLepton( df2 , npar );
+      auto df1 = mkGenpart( rdff , name );
+      //auto df2 = mkGenjet( df1 , npar );
+      //auto df3 = mkDressedLepton( df2 , npar );
       
-      dataframes_.insert( { name , df3 } );
+      dataframes_.insert( { name , df1 } );
     }
 
   // apply action
