@@ -1,7 +1,7 @@
 #include "postproc.h"
 #include "analyzers/genpart.h"
-//#include "analyzers/genjets.h"
-//#include "analyzers/dressedlepton.h"
+#include "analyzers/genjets.h"
+#include "analyzers/dressedlepton.h"
 
 int main() {
   
@@ -25,10 +25,10 @@ int main() {
       cout << "--> applying transformations : " << name << endl;
       RNode rdff(rdf);
       auto df1 = mkGenpart( rdff , name );
-      //auto df2 = mkGenjet( df1 , npar );
-      //auto df3 = mkDressedLepton( df2 , npar );
+      auto df2 = mkGenjet( df1 );
+      auto df3 = mkDressedLepton( df2 );
       
-      dataframes_.insert( { name , df1 } );
+      dataframes_.insert( { name , df3 } );
     }
 
   // apply action

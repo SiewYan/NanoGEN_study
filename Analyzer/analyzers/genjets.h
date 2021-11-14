@@ -8,8 +8,10 @@
 //* - jet is considered a light-flavour jet if there are no b or c "ghost" hadrons clustered inside it (hadronFlavour = 0)
 
 template<typename T>
-auto mkGenjet( T &df , const int &njet ) {
+auto mkGenjet( T &df ) {
   using namespace ROOT::VecOps;
+
+  cout << " --> Registers mkGenjet <-- " << endl;
   
   // lambda function
   auto eval = [&](
@@ -26,14 +28,11 @@ auto mkGenjet( T &df , const int &njet ) {
 		  RVec<int>& GenJet_partonFlavour_,
 		  RVec<unsigned char>& GenJet_hadronFlavour_
 		  ){
-    int nGenJet_ = GenJet_pt_.size();
-    int nGenJetAK8_ = GenJetAK8_pt_.size();
+    const int nGenJet_ = GenJet_pt_.size();
+    const int nGenJetAK8_ = GenJetAK8_pt_.size();
 
-    vector< std::pair< Math::PtEtaPhiMVector , int > > outak4;
-    vector< std::pair< Math::PtEtaPhiMVector , int > > outak8;
-
-    //out
-    //std::pair< vector< std::pair< Math::PtEtaPhiMVector , int > > , vector< std::pair< Math::PtEtaPhiMVector , int > >  > out;
+    RVec< std::pair< Math::PtEtaPhiMVector , int > > out_ak4;
+    RVec< std::pair< Math::PtEtaPhiMVector , int > > out_ak8;
     
     //AK4
     for ( auto i = 0 ; i < nGenJet_ ; i++ ){
@@ -43,7 +42,7 @@ auto mkGenjet( T &df , const int &njet ) {
       if ( GenJet_hadronFlavour_[i] != 0 ) continue;
       
       Math::PtEtaPhiMVector VX( GenJet_pt_[i] , GenJet_eta_[i] , GenJet_phi_[i] , GenJet_mass_[i] );
-      outak4.push_back( std::make_pair( VX , GenJet_partonFlavour_[i] ) );
+      out_ak4.push_back( std::make_pair( VX , GenJet_partonFlavour_[i] ) );
       
     }
 
@@ -55,15 +54,22 @@ auto mkGenjet( T &df , const int &njet ) {
       if ( GenJetAK8_hadronFlavour_[i] != 0 )continue;
 
       Math::PtEtaPhiMVector VX( GenJetAK8_pt_[i] , GenJetAK8_eta_[i] , GenJetAK8_phi_[i] , GenJetAK8_mass_[i] );
-      outak8.push_back( std::make_pair( VX , GenJetAK8_partonFlavour_[i] ) );
+      out_ak8.push_back( std::make_pair( VX , GenJetAK8_partonFlavour_[i] ) );
       
     }
 
     // sorting in descending pt
-    return std::make_tuple( 
-			   std::make_pair( IndexByPt( outak4 , njet ) , static_cast<int>( outak4.size() ) ),
-			   std::make_pair( IndexByPt( outak8 , njet ) , static_cast<int>( outak4.size() ) )
-			    );
+    out_ak4 = IndexByPt( out_ak4 ); out_ak8 = IndexByPt( out_ak8 );
+    LorentzVec fp_ak4, fp_ak8; pdgIdVec id_ak4, id_ak8;
+
+    for ( auto thepair : out_ak4 ) {
+      fp_ak4.push_back(thepair.first); id_ak4.push_back(thepair.second);
+    }
+    for ( auto thepair : out_ak8 ) {
+      fp_ak8.push_back(thepair.first); id_ak8.push_back(thepair.second);
+    }
+
+    return std::make_tuple( fp_ak4 , id_ak4 , fp_ak8 , id_ak8 );
   };
   
   auto dfout = df
@@ -82,36 +88,11 @@ auto mkGenjet( T &df , const int &njet ) {
 	  "GenJet_hadronFlavour"
 	    }
       )
-    .Define( "genjetak4_out"       , "std::get<0>(genjet_out).first"         )
-    .Define( "genjetak8_out"       , "std::get<1>(genjet_out).first"         )
-    .Define( "nAK4jet"         , "std::get<0>(genjet_out).second" )
-    .Define( "nAK8jet"         , "std::get<1>(genjet_out).second" )
+    .Define( "GenJetAK4"       , "std::get<0>(genjet_out)"         )
+    .Define( "GenJetAK4_pdgId" , "std::get<1>(genjet_out)"         )
+    .Define( "GenJetAK8"       , "std::get<2>(genjet_out)" )
+    .Define( "GenJetAK8_pdgId" , "std::get<3>(genjet_out)" )
     ;
-  
-  for (auto i = 0; i < njet; ++i){
-
-    //AK4
-    dfout = dfout.Define( "AK4jet" + to_string(i+1) + "_pdgId" ,
-                          "genjetak4_out[" + to_string(i) + "].second" );
-    //AK8
-    dfout = dfout.Define( "AK8jet" + to_string(i+1) + "_pdgId" ,
-                          "genjetak8_out[" + to_string(i) + "].second" );
-
-    // 4 vector
-    // AK4
-    for ( auto feature : { "Pt" , "Eta" , "Phi" , "M" } ) {
-      string var = "AK4jet" + to_string(i+1) + "_" + feature;
-      string def = "genjetak4_out[" + to_string(i) + "].first."+ feature +"()";
-      dfout = dfout.Define( var , def );
-    }
-    
-    // AK8 
-    for ( auto feature : { "Pt" , "Eta" , "Phi" , "M" } ) {
-      string var = "AK8jet" + to_string(i+1) + "_" + feature;
-      string def = "genjetak8_out[" + to_string(i) + "].first."+ feature +"()";
-      dfout = dfout.Define( var , def );
-    }
-  }
   
   return dfout;
 }

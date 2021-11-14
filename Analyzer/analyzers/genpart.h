@@ -4,6 +4,8 @@
 template<typename T>
 auto mkGenpart( T &df , const string &name ) {
   using namespace ROOT::VecOps;
+
+  cout << " --> Registers mkGenpart <-- " << endl;
     
   // lambda function
   auto eval = [&](
@@ -72,7 +74,7 @@ auto mkGenpart( T &df , const string &name ) {
     }
 
     //flatten 
-    RVec<Math::PtEtaPhiMVector> fp ; RVec<int> id;
+    LorentzVec fp ; pdgIdVec id;
     out = IndexByPt( out );
     for ( auto thepair : out ) {
       fp.push_back(thepair.first); id.push_back(thepair.second);

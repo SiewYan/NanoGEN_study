@@ -37,6 +37,8 @@ using namespace std;
 
 //typedef map< string, RDataFrame > Mapdf;
 typedef map< string, RNode > Mapdf;
+typedef RVec<Math::PtEtaPhiMVector> LorentzVec;
+typedef RVec<int> pdgIdVec;
 
 int boson[3]   = { 24 , -24 };
 //int parton[8] = { 1, -1, 2, -2, 3, -3, 4, -4 };
