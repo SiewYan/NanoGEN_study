@@ -1,7 +1,7 @@
 #include "postproc.h"
-#include "analyzers/genpart.h"
-#include "analyzers/genjets.h"
-#include "analyzers/dressedlepton.h"
+#include "interface/genpart.h"
+#include "interface/genjets.h"
+#include "interface/dressedlepton.h"
 
 int main() {
   
@@ -21,7 +21,6 @@ int main() {
   // apply transformation
   for ( const auto& [ name , rdf ] : dataframes )
     {
-      //if ( name != "powheg" ) continue;
       cout << "--> applying transformations : " << name << endl;
       RNode rdff(rdf);
       auto df1 = mkGenpart( rdff , name );
