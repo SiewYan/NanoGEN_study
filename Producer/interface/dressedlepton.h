@@ -21,21 +21,14 @@ auto mkDressedLepton( T &df ) {
 
     for ( auto i = 0 ; i < nGenDressedLepton_ ; i++ ){
       if ( !( std::find( std::begin( lepton ), std::end( lepton ), GenDressedLepton_pdgId_[i] ) != std::end( lepton ) ) ) continue;
-
-      Math::PtEtaPhiMVector VX( GenDressedLepton_pt_[i] , GenDressedLepton_eta_[i] , GenDressedLepton_phi_[i] , GenDressedLepton_mass_[i] );
+      
+      Math::PtEtaPhiMVector VX( GenDressedLepton_pt_[i] , GenDressedLepton_eta_[i] , 
+				GenDressedLepton_phi_[i] , GenDressedLepton_mass_[i] 
+				);
       out.push_back( std::make_pair( VX , GenDressedLepton_pdgId_[i] ) );
     }
-
-    LorentzVec fp( Ncol , Vdummy ); vector<int> id( Ncol , -9999. );
-    int ctr=0;
-    out = IndexByPt( out );
-    for ( auto thepair : out ) {
-      fp.at(ctr) = thepair.first; id.at(ctr) = thepair.second;
-      ctr++;
-      if (ctr == Ncol) break;
-    }
-
-    return std::make_tuple( fp , id , static_cast<int>(out.size()) );
+    
+    return mktuple( out );
   }; 
   
   string colName = "DressedLepton";

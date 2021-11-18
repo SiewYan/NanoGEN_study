@@ -38,17 +38,7 @@ auto mkGenjetAK8( T &df ) {
       
     }
     
-    LorentzVec fp( Ncol , Vdummy ); vector<int> id( Ncol , -9999. );
-    int ctr=0;
-
-    out = IndexByPt( out ); 
-    for ( auto thepair : out ) {
-      fp.at(ctr) = thepair.first; id.at(ctr) = thepair.second;
-      ctr++;
-      if (ctr == Ncol) break;
-    }
-
-    return std::make_tuple( fp , id , static_cast<int>(out.size()) );
+    return mktuple( out );
   };
   
   // run module

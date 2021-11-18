@@ -93,6 +93,22 @@ auto isOut = [](string x){
 };
 
 //
+auto mktuple( typeOut out_ ) {
+  
+  LorentzVec fp( Ncol , Vdummy ); vector<int> id( Ncol , -9999. );
+  int ctr=0;
+  out_ = IndexByPt( out_ );
+  
+  for ( auto thepair : out_ ) {
+    fp.at(ctr) = thepair.first; id.at(ctr) = thepair.second;
+    ctr++;
+    if (ctr == Ncol) break;
+  }
+  
+  return std::make_tuple( fp , id , static_cast<int>(out_.size()) );
+}
+
+//
 template<typename T>
 auto flattendf( T &df , string &collection ) {
 
