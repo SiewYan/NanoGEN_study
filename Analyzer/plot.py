@@ -37,7 +37,10 @@ def bookHistogram( df_ , name_ , xbin_ , title_ ):
 pass
 
 # plot
-def compare( hist_ref , hist , name_ ):
+def compare( hist_ref_ , hist_ , PNGname_ ):
+
+    hist_ref = hist_ref_.GetPtr()
+    hist = hist_.GetPtr()
  
     canvas = ROOT.TCanvas("canvas")
     
@@ -46,19 +49,63 @@ def compare( hist_ref , hist , name_ ):
     ratio.SetLineColor(ROOT.kRed)
 
     pad1 = ROOT.TPad("pad1","pad1",0,0.3,1,1)
+    pad1.SetBottomMargin(0)
     pad1.SetLogy(True)
     pad1.Draw()
     pad1.cd()
 
-    hist_ref.Draw("HIST")
-    hist.Draw("HIST SAME")
+    hist_ref.Draw("h")
+    hist.Draw("h SAME")
+
+    # pad1 style
+    hist_ref.SetTitle("")
+    hist_ref.GetXaxis().SetLabelSize(0)
+    hist_ref.GetXaxis().SetTitleSize(0)
+    hist_ref.GetYaxis().SetTitleSize(0.05)
+
+    # description (if any)
+    latex = ROOT.TLatex()
+    latex.SetNDC()
+    latex.SetTextSize(0.06)
+    latex.DrawText(0.7 ,0.83 , "Run 2018" )
+    latex.SetTextSize(0.04)
+    latex.DrawText(0.7 ,0.77 , " WWjets NLO events" )
+
+    # legend     
+    legend = ROOT.TLegend(0.7 ,0.6 ,0.85 ,0.75)
+    legend.AddEntry( hist_ref , "Powheg" )
+    legend.AddEntry( hist , "Sherpa" )
+    legend.SetLineWidth(0)
+    legend.Draw("same")
+
 
     canvas.cd()
     pad2 = ROOT.TPad("pad2","pad2",0,0.05,1,0.3)
+    pad2.SetTopMargin(0)
+    pad2.SetBottomMargin(0.25)
     pad2.Draw()
     pad2.cd()
+    
     ratio.Draw("pe")
-    canvas.Print(name_)
+
+    # ratio style
+    ratio.SetTitle("")
+    ratio.GetXaxis().SetLabelSize(0.12)
+    ratio.GetXaxis().SetTitleSize(0.12)
+    ratio.GetYaxis().SetLabelSize(0.1)
+    ratio.GetYaxis().SetTitleSize(0.15)
+    ratio.GetYaxis().SetTitle("Sherpa / Powheg")
+    ratio.GetYaxis().SetTitleOffset(0.3)
+
+    ratio.GetYaxis().SetRangeUser(0.5 ,1.5)
+    ratio.GetYaxis().SetNdivisions(207)
+
+    line = ROOT.TLine(50.e3 ,1 ,200.e3 ,1)
+    line.SetLineColor(ROOT.kBlack)
+    line.SetLineWidth(2)
+    line.Draw("same")
+
+    canvas.Print(PNGname_)
     
 pass
     
@@ -72,11 +119,11 @@ if __name__ == "__main__":
     for sample, df in dataframes.items(): 
         varlist = OrderedDict();
         # collection
-        for var in [ 'Lepton' ]: #, 'GenJetAK4' , 'GenJetAK8' ]:
+        for var in [ 'Lepton' , 'GenJetAK4' , 'GenJetAK8' ]:
             # 4 momentum var
             for ivar, xb in {**fp_template, **addvar}.items():
                 
-                if ivar in [ 'Pt' , 'Eta' , 'Phi' , 'M' ]: continue
+                #if ivar in [ 'Pt' , 'Eta' , 'Phi' , 'M' ]: continue
                 
                 # number 
                 for i in range(0,3):
