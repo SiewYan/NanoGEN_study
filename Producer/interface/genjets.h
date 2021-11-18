@@ -58,15 +58,22 @@ auto mkGenjet( T &df ) {
       
     }
 
-    // sorting in descending pt
+    LorentzVec fp_ak4( Ncol , Vdummy ); orentzVec fp_ak8( Ncol , Vdummy );
+    vector<int> id_ak4( Ncol , -9999. ); vector<int> id_ak8( Ncol , -9999. );
     out_ak4 = IndexByPt( out_ak4 ); out_ak8 = IndexByPt( out_ak8 );
-    LorentzVec fp_ak4, fp_ak8; pdgIdVec id_ak4, id_ak8;
 
+    int ctr4=0;
     for ( auto thepair : out_ak4 ) {
-      fp_ak4.push_back(thepair.first); id_ak4.push_back(thepair.second);
+      fp_ak4.at(ctr4) = thepair.first; id_ak4.at(ctr4) = thepair.second;
+      ctr4++;
+      if (ctr4 == Ncol) break;
     }
+
+    nt ctr8=0;
     for ( auto thepair : out_ak8 ) {
-      fp_ak8.push_back(thepair.first); id_ak8.push_back(thepair.second);
+      fp_ak8.at(ctr4) = thepair.first; id_ak8.at(ctr4) = thepair.second;
+      ctr8++;
+      if (ctr8 == Ncol) break;
     }
 
     return std::make_tuple( fp_ak4 , id_ak4 , fp_ak8 , id_ak8 );

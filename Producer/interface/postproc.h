@@ -26,8 +26,8 @@
 
 //#include "TRandom3.h" 
 //#include "TLorentzVector.h"
-#include <TInterpreter.h>
-#include "mydict.cxx"
+//#include <TInterpreter.h>
+#include "../mydict.cxx"
 
 //TInterpreter groot(); groot.GenerateDictionary( "vector<TLorentzVector>" , "vector" );
 
@@ -35,10 +35,11 @@ using namespace ROOT;
 using RNode = ROOT::RDF::RNode;
 using namespace std;
 
-//typedef map< string, RDataFrame > Mapdf;
 typedef map< string, RNode > Mapdf;
-typedef RVec<Math::PtEtaPhiMVector> LorentzVec;
-typedef RVec<int> pdgIdVec;
+typedef std::vector<Math::PtEtaPhiMVector> LorentzVec;
+typedef std::vector< std::pair<Math::PtEtaPhiMVector , int> > typeOut;
+const int Ncol = 3;
+Math::PtEtaPhiMVector Vdummy( -9999. , -9999. , -9999. , -9999. );
 
 int boson[3]   = { 24 , -24 };
 //int parton[8] = { 1, -1, 2, -2, 3, -3, 4, -4 };
@@ -78,15 +79,44 @@ struct ptsorter {
 };
 
 //
-RVec< std::pair< Math::PtEtaPhiMVector , int > > IndexByPt( RVec< std::pair< Math::PtEtaPhiMVector , int > > vector ){
+std::vector< std::pair< Math::PtEtaPhiMVector , int > > IndexByPt( std::vector< std::pair< Math::PtEtaPhiMVector , int > > vector ){
   ptsorter comparator; sort (vector.begin() , vector.end() , comparator);
   return vector;
 }
 
 //
 auto isOut = [](string x){
-  return x.find("_out") != std::string::npos;
+  return (
+	  x.find("_tuple") != std::string::npos ||
+	  x.find("_") == std::string::npos
+	  );
 };
+
+//
+template<typename T>
+auto flattendf( T &df , string &collection ) {
+
+  auto dfout_ = df
+    .Define( collection        , "std::get<0>(" + collection + "_tuple)"  )
+    .Define( collection + "Id" , "std::get<1>(" + collection + "_tuple)"  )
+    .Define( "n_" + collection  , "std::get<2>(" + collection + "_tuple)" )
+    ;
+  
+  for (auto i = 0; i < Ncol; ++i){
+    
+    // 4 vector kinematics
+    for ( auto feature : { "Pt" , "Eta" , "Phi" , "M" } ) {
+      string var = collection + to_string(i+1) + "_" + feature;
+      string def = collection + "[" + to_string(i) + "]." + feature +"()";
+      dfout_ = dfout_.Define( var , def );
+    }
+    
+    // pdgid
+    dfout_ = dfout_.Define( collection + to_string(i+1) + "_pdgId"  , collection + "Id[" + to_string(i) + "]" );
+  }
+  
+  return dfout_;
+}
 
 //
 auto mkoutput( RNode df ){

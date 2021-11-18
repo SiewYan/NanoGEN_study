@@ -5,5 +5,7 @@
 
 #ifdef __ROOTCLING__
 //#pragma link C++ class vector<ROOT::Math::LorentzVector<ROOT::Math::PtEtaPhiM4D<double> > > +;
-#pragma link C++ class vector<ROOT::Math::LorentzVector<ROOT::Math::PtEtaPhiM4D<double> >,ROOT::Detail::VecOps::RAdoptAllocator<ROOT::Math::LorentzVector<ROOT::Math::PtEtaPhiM4D<double> > > > +;
+//#pragma link C++ class vector<ROOT::Math::LorentzVector<ROOT::Math::PtEtaPhiM4D<double> >,ROOT::Detail::VecOps::RAdoptAllocator<ROOT::Math::LorentzVector<ROOT::Math::PtEtaPhiM4D<double> > > > +;
+//vector<ROOT::Math::LorentzVector<ROOT::Math::PtEtaPhiM4D<double> > >
+#pragma link C++ class vector<ROOT::Math::LorentzVector<ROOT::Math::PtEtaPhiM4D<double> > > +;
 #endif

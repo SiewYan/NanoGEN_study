@@ -15,9 +15,9 @@ auto mkDressedLepton( T &df ) {
 		  RVec<float>& GenDressedLepton_pt_,
 		  RVec<int>& GenDressedLepton_pdgId_
 		  ){
-    int nGenDressedLepton_ = GenDressedLepton_pt_.size();
+    const int nGenDressedLepton_ = GenDressedLepton_pt_.size();
 
-    RVec< std::pair< Math::PtEtaPhiMVector , int > > out;
+    typeOut out;
 
     for ( auto i = 0 ; i < nGenDressedLepton_ ; i++ ){
       if ( !( std::find( std::begin( lepton ), std::end( lepton ), GenDressedLepton_pdgId_[i] ) != std::end( lepton ) ) ) continue;
@@ -26,29 +26,30 @@ auto mkDressedLepton( T &df ) {
       out.push_back( std::make_pair( VX , GenDressedLepton_pdgId_[i] ) );
     }
 
-    //flatten                                                                                                                                                                                             
-    LorentzVec fp ; pdgIdVec id;
+    LorentzVec fp( Ncol , Vdummy ); vector<int> id( Ncol , -9999. );
+    int ctr=0;
     out = IndexByPt( out );
     for ( auto thepair : out ) {
-      fp.push_back(thepair.first); id.push_back(thepair.second);
+      fp.at(ctr) = thepair.first; id.at(ctr) = thepair.second;
+      ctr++;
+      if (ctr == Ncol) break;
     }
-    return std::make_tuple( fp , id );
+
+    return std::make_tuple( fp , id , static_cast<int>(out.size()) );
   }; 
   
-  auto dfout = df
-    .Define( "DressedLepton_out" , eval , {
-	"GenDressedLepton_eta",
-	  "GenDressedLepton_mass",
-	  "GenDressedLepton_phi",
-	  "GenDressedLepton_pt",
-	  "GenDressedLepton_pdgId"
-	  }
-      )
-    .Define( "dressedlepton"         , "std::get<0>(DressedLepton_out)" )
-    .Define( "dressedlepton_pdgId"   , "std::get<1>(DressedLepton_out)" )
-    ;
-  
-  return dfout;
+  string colName = "DressedLepton";
+  auto dfout = df.Define( 
+			 colName + "_tuple" , eval ,
+			 {
+			   "GenDressedLepton_eta",
+			     "GenDressedLepton_mass",
+			     "GenDressedLepton_phi",
+			     "GenDressedLepton_pt",
+			     "GenDressedLepton_pdgId"
+			     }
+			  );
+  return flattendf( dfout , colName );
 }
 
 #endif

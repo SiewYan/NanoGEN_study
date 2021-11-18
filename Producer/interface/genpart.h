@@ -21,8 +21,7 @@ auto mkGenpart( T &df , const string &name ) {
     // pt,eta,phi,mass for leading pt of lepton; lepton; w1 ; w2 ; ww
     const int nGenPart_ = GenPart_pt_.size();
     
-    //vector< std::pair< Math::PtEtaPhiMVector , int > > out;
-    RVec< std::pair<Math::PtEtaPhiMVector , int> > out;
+    typeOut out;
     
     for ( auto i = 0 ; i < nGenPart_ ; i++ ){
       
@@ -72,25 +71,35 @@ auto mkGenpart( T &df , const string &name ) {
       **/
       
     }
-
-    //flatten 
-    LorentzVec fp ; pdgIdVec id;
+    
+    LorentzVec fp( Ncol , Vdummy ); vector<int> id( Ncol , -9999. );
+    int ctr=0;
     out = IndexByPt( out );
     for ( auto thepair : out ) {
-      fp.push_back(thepair.first); id.push_back(thepair.second);
+      fp.at(ctr) = thepair.first; id.at(ctr) = thepair.second;
+      ctr++;
+      if (ctr == Ncol) break;
     }
-    return std::make_tuple( fp , id );
+    
+    return std::make_tuple( fp , id , static_cast<int>(out.size()) );
   };
-
-  auto dfout = df
-    .Define( "genpart_out" , eval , { "GenPart_eta" , "GenPart_mass" , "GenPart_phi" , "GenPart_pt" , 
-	  "GenPart_genPartIdxMother" , "GenPart_pdgId" , "GenPart_status" , "GenPart_statusFlags" }
-      )
-    .Define( "Lepton"        , "std::get<0>(genpart_out)"                )
-    .Define( "Lepton_pdgId"  , "std::get<1>(genpart_out)"                )
-    ;
   
-  return dfout;
+  // run module
+  string colName = "Lepton";
+  auto dfout = df.Define( 
+			 colName + "_tuple" , eval , 
+			 { 
+			   "GenPart_eta" , 
+			     "GenPart_mass" , 
+			     "GenPart_phi" ,
+			     "GenPart_pt" , 
+			     "GenPart_genPartIdxMother" , 
+			     "GenPart_pdgId" , 
+			     "GenPart_status" , 
+			     "GenPart_statusFlags" 
+			     }
+			  );
+  return flattendf( dfout , colName );
 }
 
 #endif
